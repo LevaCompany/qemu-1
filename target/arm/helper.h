@@ -1,1051 +1,2674 @@
-DEF_HELPER_FLAGS_1(sxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
-DEF_HELPER_FLAGS_1(uxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
-
-DEF_HELPER_3(add_setq, i32, env, i32, i32)
-DEF_HELPER_3(add_saturate, i32, env, i32, i32)
-DEF_HELPER_3(sub_saturate, i32, env, i32, i32)
-DEF_HELPER_3(add_usaturate, i32, env, i32, i32)
-DEF_HELPER_3(sub_usaturate, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(sdiv, TCG_CALL_NO_RWG, s32, env, s32, s32)
-DEF_HELPER_FLAGS_3(udiv, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_1(rbit, TCG_CALL_NO_RWG_SE, i32, i32)
-
-#define PAS_OP(pfx)  \
-    DEF_HELPER_3(pfx ## add8, i32, i32, i32, ptr) \
-    DEF_HELPER_3(pfx ## sub8, i32, i32, i32, ptr) \
-    DEF_HELPER_3(pfx ## sub16, i32, i32, i32, ptr) \
-    DEF_HELPER_3(pfx ## add16, i32, i32, i32, ptr) \
-    DEF_HELPER_3(pfx ## addsubx, i32, i32, i32, ptr) \
-    DEF_HELPER_3(pfx ## subaddx, i32, i32, i32, ptr)
-
-PAS_OP(s)
-PAS_OP(u)
-#undef PAS_OP
-
-#define PAS_OP(pfx)  \
-    DEF_HELPER_2(pfx ## add8, i32, i32, i32) \
-    DEF_HELPER_2(pfx ## sub8, i32, i32, i32) \
-    DEF_HELPER_2(pfx ## sub16, i32, i32, i32) \
-    DEF_HELPER_2(pfx ## add16, i32, i32, i32) \
-    DEF_HELPER_2(pfx ## addsubx, i32, i32, i32) \
-    DEF_HELPER_2(pfx ## subaddx, i32, i32, i32)
-PAS_OP(q)
-PAS_OP(sh)
-PAS_OP(uq)
-PAS_OP(uh)
-#undef PAS_OP
-
-DEF_HELPER_3(ssat, i32, env, i32, i32)
-DEF_HELPER_3(usat, i32, env, i32, i32)
-DEF_HELPER_3(ssat16, i32, env, i32, i32)
-DEF_HELPER_3(usat16, i32, env, i32, i32)
-
-DEF_HELPER_FLAGS_2(usad8, TCG_CALL_NO_RWG_SE, i32, i32, i32)
-
-DEF_HELPER_FLAGS_3(sel_flags, TCG_CALL_NO_RWG_SE,
-                   i32, i32, i32, i32)
-DEF_HELPER_2(exception_internal, noreturn, env, i32)
-DEF_HELPER_3(exception_with_syndrome, noreturn, env, i32, i32)
-DEF_HELPER_4(exception_with_syndrome_el, noreturn, env, i32, i32, i32)
-DEF_HELPER_2(exception_bkpt_insn, noreturn, env, i32)
-DEF_HELPER_2(exception_swstep, noreturn, env, i32)
-DEF_HELPER_2(exception_pc_alignment, noreturn, env, tl)
-DEF_HELPER_1(setend, void, env)
-DEF_HELPER_2(wfi, void, env, i32)
-DEF_HELPER_1(wfe, void, env)
-DEF_HELPER_1(yield, void, env)
-DEF_HELPER_1(pre_hvc, void, env)
-DEF_HELPER_2(pre_smc, void, env, i32)
-DEF_HELPER_1(vesb, void, env)
-
-DEF_HELPER_3(cpsr_write, void, env, i32, i32)
-DEF_HELPER_2(cpsr_write_eret, void, env, i32)
-DEF_HELPER_1(cpsr_read, i32, env)
-
-DEF_HELPER_3(v7m_msr, void, env, i32, i32)
-DEF_HELPER_2(v7m_mrs, i32, env, i32)
-
-DEF_HELPER_2(v7m_bxns, void, env, i32)
-DEF_HELPER_2(v7m_blxns, void, env, i32)
-
-DEF_HELPER_3(v7m_tt, i32, env, i32, i32)
-
-DEF_HELPER_1(v7m_preserve_fp_state, void, env)
-
-DEF_HELPER_2(v7m_vlstm, void, env, i32)
-DEF_HELPER_2(v7m_vlldm, void, env, i32)
-
-DEF_HELPER_2(v8m_stackcheck, void, env, i32)
-
-DEF_HELPER_FLAGS_2(check_bxj_trap, TCG_CALL_NO_WG, void, env, i32)
-
-DEF_HELPER_4(access_check_cp_reg, cptr, env, i32, i32, i32)
-DEF_HELPER_FLAGS_2(lookup_cp_reg, TCG_CALL_NO_RWG_SE, cptr, env, i32)
-DEF_HELPER_FLAGS_2(tidcp_el0, TCG_CALL_NO_WG, void, env, i32)
-DEF_HELPER_FLAGS_2(tidcp_el1, TCG_CALL_NO_WG, void, env, i32)
-DEF_HELPER_3(set_cp_reg, void, env, cptr, i32)
-DEF_HELPER_2(get_cp_reg, i32, env, cptr)
-DEF_HELPER_3(set_cp_reg64, void, env, cptr, i64)
-DEF_HELPER_2(get_cp_reg64, i64, env, cptr)
-
-DEF_HELPER_2(get_r13_banked, i32, env, i32)
-DEF_HELPER_3(set_r13_banked, void, env, i32, i32)
-
-DEF_HELPER_3(mrs_banked, i32, env, i32, i32)
-DEF_HELPER_4(msr_banked, void, env, i32, i32, i32)
-
-DEF_HELPER_2(get_user_reg, i32, env, i32)
-DEF_HELPER_3(set_user_reg, void, env, i32, i32)
-
-DEF_HELPER_FLAGS_1(rebuild_hflags_m32_newel, TCG_CALL_NO_RWG, void, env)
-DEF_HELPER_FLAGS_2(rebuild_hflags_m32, TCG_CALL_NO_RWG, void, env, int)
-DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
-DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
-DEF_HELPER_FLAGS_2(rebuild_hflags_a64, TCG_CALL_NO_RWG, void, env, int)
-
-DEF_HELPER_FLAGS_5(probe_access, TCG_CALL_NO_WG, void, env, tl, i32, i32, i32)
-
-DEF_HELPER_1(vfp_get_fpscr, i32, env)
-DEF_HELPER_2(vfp_set_fpscr, void, env, i32)
-
-DEF_HELPER_3(vfp_addh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_adds, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_addd, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_subh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_subs, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_subd, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_mulh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_muls, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_muld, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_divh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_divs, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_divd, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_maxh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_maxs, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_maxd, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_minh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_mins, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_mind, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_maxnumh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_maxnums, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_maxnumd, f64, f64, f64, ptr)
-DEF_HELPER_3(vfp_minnumh, f16, f16, f16, ptr)
-DEF_HELPER_3(vfp_minnums, f32, f32, f32, ptr)
-DEF_HELPER_3(vfp_minnumd, f64, f64, f64, ptr)
-DEF_HELPER_1(vfp_negh, f16, f16)
-DEF_HELPER_1(vfp_negs, f32, f32)
-DEF_HELPER_1(vfp_negd, f64, f64)
-DEF_HELPER_1(vfp_absh, f16, f16)
-DEF_HELPER_1(vfp_abss, f32, f32)
-DEF_HELPER_1(vfp_absd, f64, f64)
-DEF_HELPER_2(vfp_sqrth, f16, f16, env)
-DEF_HELPER_2(vfp_sqrts, f32, f32, env)
-DEF_HELPER_2(vfp_sqrtd, f64, f64, env)
-DEF_HELPER_3(vfp_cmph, void, f16, f16, env)
-DEF_HELPER_3(vfp_cmps, void, f32, f32, env)
-DEF_HELPER_3(vfp_cmpd, void, f64, f64, env)
-DEF_HELPER_3(vfp_cmpeh, void, f16, f16, env)
-DEF_HELPER_3(vfp_cmpes, void, f32, f32, env)
-DEF_HELPER_3(vfp_cmped, void, f64, f64, env)
-
-DEF_HELPER_2(vfp_fcvtds, f64, f32, env)
-DEF_HELPER_2(vfp_fcvtsd, f32, f64, env)
-DEF_HELPER_FLAGS_2(bfcvt, TCG_CALL_NO_RWG, i32, f32, ptr)
-DEF_HELPER_FLAGS_2(bfcvt_pair, TCG_CALL_NO_RWG, i32, i64, ptr)
-
-DEF_HELPER_2(vfp_uitoh, f16, i32, ptr)
-DEF_HELPER_2(vfp_uitos, f32, i32, ptr)
-DEF_HELPER_2(vfp_uitod, f64, i32, ptr)
-DEF_HELPER_2(vfp_sitoh, f16, i32, ptr)
-DEF_HELPER_2(vfp_sitos, f32, i32, ptr)
-DEF_HELPER_2(vfp_sitod, f64, i32, ptr)
-
-DEF_HELPER_2(vfp_touih, i32, f16, ptr)
-DEF_HELPER_2(vfp_touis, i32, f32, ptr)
-DEF_HELPER_2(vfp_touid, i32, f64, ptr)
-DEF_HELPER_2(vfp_touizh, i32, f16, ptr)
-DEF_HELPER_2(vfp_touizs, i32, f32, ptr)
-DEF_HELPER_2(vfp_touizd, i32, f64, ptr)
-DEF_HELPER_2(vfp_tosih, s32, f16, ptr)
-DEF_HELPER_2(vfp_tosis, s32, f32, ptr)
-DEF_HELPER_2(vfp_tosid, s32, f64, ptr)
-DEF_HELPER_2(vfp_tosizh, s32, f16, ptr)
-DEF_HELPER_2(vfp_tosizs, s32, f32, ptr)
-DEF_HELPER_2(vfp_tosizd, s32, f64, ptr)
-
-DEF_HELPER_3(vfp_toshh_round_to_zero, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_toslh_round_to_zero, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_touhh_round_to_zero, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_toulh_round_to_zero, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_toshs_round_to_zero, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_tosls_round_to_zero, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_touhs_round_to_zero, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_touls_round_to_zero, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_toshd_round_to_zero, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_tosld_round_to_zero, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_touhd_round_to_zero, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_tould_round_to_zero, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_touhh, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_toshh, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_toulh, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_toslh, i32, f16, i32, ptr)
-DEF_HELPER_3(vfp_touqh, i64, f16, i32, ptr)
-DEF_HELPER_3(vfp_tosqh, i64, f16, i32, ptr)
-DEF_HELPER_3(vfp_toshs, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_tosls, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_tosqs, i64, f32, i32, ptr)
-DEF_HELPER_3(vfp_touhs, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_touls, i32, f32, i32, ptr)
-DEF_HELPER_3(vfp_touqs, i64, f32, i32, ptr)
-DEF_HELPER_3(vfp_toshd, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_tosld, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_tosqd, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_touhd, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_tould, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_touqd, i64, f64, i32, ptr)
-DEF_HELPER_3(vfp_shtos, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_sltos, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_sqtos, f32, i64, i32, ptr)
-DEF_HELPER_3(vfp_uhtos, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_ultos, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_uqtos, f32, i64, i32, ptr)
-DEF_HELPER_3(vfp_shtod, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_sltod, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_sqtod, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_uhtod, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_ultod, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_uqtod, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_shtoh, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_uhtoh, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_sltoh, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_ultoh, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_sqtoh, f16, i64, i32, ptr)
-DEF_HELPER_3(vfp_uqtoh, f16, i64, i32, ptr)
-
-DEF_HELPER_3(vfp_shtos_round_to_nearest, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_sltos_round_to_nearest, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_uhtos_round_to_nearest, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_ultos_round_to_nearest, f32, i32, i32, ptr)
-DEF_HELPER_3(vfp_shtod_round_to_nearest, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_sltod_round_to_nearest, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_uhtod_round_to_nearest, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_ultod_round_to_nearest, f64, i64, i32, ptr)
-DEF_HELPER_3(vfp_shtoh_round_to_nearest, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_uhtoh_round_to_nearest, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_sltoh_round_to_nearest, f16, i32, i32, ptr)
-DEF_HELPER_3(vfp_ultoh_round_to_nearest, f16, i32, i32, ptr)
-
-DEF_HELPER_FLAGS_2(set_rmode, TCG_CALL_NO_RWG, i32, i32, ptr)
-
-DEF_HELPER_FLAGS_3(vfp_fcvt_f16_to_f32, TCG_CALL_NO_RWG, f32, f16, ptr, i32)
-DEF_HELPER_FLAGS_3(vfp_fcvt_f32_to_f16, TCG_CALL_NO_RWG, f16, f32, ptr, i32)
-DEF_HELPER_FLAGS_3(vfp_fcvt_f16_to_f64, TCG_CALL_NO_RWG, f64, f16, ptr, i32)
-DEF_HELPER_FLAGS_3(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, f16, f64, ptr, i32)
-
-DEF_HELPER_4(vfp_muladdd, f64, f64, f64, f64, ptr)
-DEF_HELPER_4(vfp_muladds, f32, f32, f32, f32, ptr)
-DEF_HELPER_4(vfp_muladdh, f16, f16, f16, f16, ptr)
-
-DEF_HELPER_FLAGS_2(recpe_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
-DEF_HELPER_FLAGS_2(recpe_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
-DEF_HELPER_FLAGS_2(recpe_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
-DEF_HELPER_FLAGS_2(rsqrte_f16, TCG_CALL_NO_RWG, f16, f16, ptr)
-DEF_HELPER_FLAGS_2(rsqrte_f32, TCG_CALL_NO_RWG, f32, f32, ptr)
-DEF_HELPER_FLAGS_2(rsqrte_f64, TCG_CALL_NO_RWG, f64, f64, ptr)
-DEF_HELPER_FLAGS_1(recpe_u32, TCG_CALL_NO_RWG, i32, i32)
-DEF_HELPER_FLAGS_1(rsqrte_u32, TCG_CALL_NO_RWG, i32, i32)
-DEF_HELPER_FLAGS_4(neon_tbl, TCG_CALL_NO_RWG, i64, env, i32, i64, i64)
-
-DEF_HELPER_3(shl_cc, i32, env, i32, i32)
-DEF_HELPER_3(shr_cc, i32, env, i32, i32)
-DEF_HELPER_3(sar_cc, i32, env, i32, i32)
-DEF_HELPER_3(ror_cc, i32, env, i32, i32)
-
-DEF_HELPER_FLAGS_2(rinth_exact, TCG_CALL_NO_RWG, f16, f16, ptr)
-DEF_HELPER_FLAGS_2(rints_exact, TCG_CALL_NO_RWG, f32, f32, ptr)
-DEF_HELPER_FLAGS_2(rintd_exact, TCG_CALL_NO_RWG, f64, f64, ptr)
-DEF_HELPER_FLAGS_2(rinth, TCG_CALL_NO_RWG, f16, f16, ptr)
-DEF_HELPER_FLAGS_2(rints, TCG_CALL_NO_RWG, f32, f32, ptr)
-DEF_HELPER_FLAGS_2(rintd, TCG_CALL_NO_RWG, f64, f64, ptr)
-
-DEF_HELPER_FLAGS_2(vjcvt, TCG_CALL_NO_RWG, i32, f64, env)
-DEF_HELPER_FLAGS_2(fjcvtzs, TCG_CALL_NO_RWG, i64, f64, ptr)
-
-DEF_HELPER_FLAGS_3(check_hcr_el2_trap, TCG_CALL_NO_WG, void, env, i32, i32)
-
-/* neon_helper.c */
-DEF_HELPER_FLAGS_3(neon_qadd_u8, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_qadd_s8, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_qadd_u16, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_qadd_s16, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_qadd_u32, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_qadd_s32, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_uqadd_s8, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_uqadd_s16, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_uqadd_s32, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_uqadd_s64, TCG_CALL_NO_RWG, i64, env, i64, i64)
-DEF_HELPER_FLAGS_3(neon_sqadd_u8, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_sqadd_u16, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_sqadd_u32, TCG_CALL_NO_RWG, i32, env, i32, i32)
-DEF_HELPER_FLAGS_3(neon_sqadd_u64, TCG_CALL_NO_RWG, i64, env, i64, i64)
-DEF_HELPER_3(neon_qsub_u8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qsub_s8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qsub_u16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qsub_s16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qsub_u32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qsub_s32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qadd_u64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qadd_s64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qsub_u64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qsub_s64, i64, env, i64, i64)
-
-DEF_HELPER_2(neon_hadd_s8, i32, i32, i32)
-DEF_HELPER_2(neon_hadd_u8, i32, i32, i32)
-DEF_HELPER_2(neon_hadd_s16, i32, i32, i32)
-DEF_HELPER_2(neon_hadd_u16, i32, i32, i32)
-DEF_HELPER_2(neon_hadd_s32, s32, s32, s32)
-DEF_HELPER_2(neon_hadd_u32, i32, i32, i32)
-DEF_HELPER_2(neon_rhadd_s8, i32, i32, i32)
-DEF_HELPER_2(neon_rhadd_u8, i32, i32, i32)
-DEF_HELPER_2(neon_rhadd_s16, i32, i32, i32)
-DEF_HELPER_2(neon_rhadd_u16, i32, i32, i32)
-DEF_HELPER_2(neon_rhadd_s32, s32, s32, s32)
-DEF_HELPER_2(neon_rhadd_u32, i32, i32, i32)
-DEF_HELPER_2(neon_hsub_s8, i32, i32, i32)
-DEF_HELPER_2(neon_hsub_u8, i32, i32, i32)
-DEF_HELPER_2(neon_hsub_s16, i32, i32, i32)
-DEF_HELPER_2(neon_hsub_u16, i32, i32, i32)
-DEF_HELPER_2(neon_hsub_s32, s32, s32, s32)
-DEF_HELPER_2(neon_hsub_u32, i32, i32, i32)
-
-DEF_HELPER_2(neon_pmin_u8, i32, i32, i32)
-DEF_HELPER_2(neon_pmin_s8, i32, i32, i32)
-DEF_HELPER_2(neon_pmin_u16, i32, i32, i32)
-DEF_HELPER_2(neon_pmin_s16, i32, i32, i32)
-DEF_HELPER_2(neon_pmax_u8, i32, i32, i32)
-DEF_HELPER_2(neon_pmax_s8, i32, i32, i32)
-DEF_HELPER_2(neon_pmax_u16, i32, i32, i32)
-DEF_HELPER_2(neon_pmax_s16, i32, i32, i32)
-
-DEF_HELPER_2(neon_shl_u16, i32, i32, i32)
-DEF_HELPER_2(neon_shl_s16, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_u8, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_s8, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_u16, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_s16, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_u32, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_s32, i32, i32, i32)
-DEF_HELPER_2(neon_rshl_u64, i64, i64, i64)
-DEF_HELPER_2(neon_rshl_s64, i64, i64, i64)
-DEF_HELPER_3(neon_qshl_u8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshl_s8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshl_u16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshl_s16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshl_u32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshl_s32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshl_u64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qshl_s64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qshlu_s8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshlu_s16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshlu_s32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qshlu_s64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qrshl_u8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrshl_s8, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrshl_u16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrshl_s16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrshl_u32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrshl_s32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrshl_u64, i64, env, i64, i64)
-DEF_HELPER_3(neon_qrshl_s64, i64, env, i64, i64)
-
-DEF_HELPER_2(neon_add_u8, i32, i32, i32)
-DEF_HELPER_2(neon_add_u16, i32, i32, i32)
-DEF_HELPER_2(neon_padd_u8, i32, i32, i32)
-DEF_HELPER_2(neon_padd_u16, i32, i32, i32)
-DEF_HELPER_2(neon_sub_u8, i32, i32, i32)
-DEF_HELPER_2(neon_sub_u16, i32, i32, i32)
-DEF_HELPER_2(neon_mul_u8, i32, i32, i32)
-DEF_HELPER_2(neon_mul_u16, i32, i32, i32)
-
-DEF_HELPER_2(neon_tst_u8, i32, i32, i32)
-DEF_HELPER_2(neon_tst_u16, i32, i32, i32)
-DEF_HELPER_2(neon_tst_u32, i32, i32, i32)
-
-DEF_HELPER_1(neon_clz_u8, i32, i32)
-DEF_HELPER_1(neon_clz_u16, i32, i32)
-DEF_HELPER_1(neon_cls_s8, i32, i32)
-DEF_HELPER_1(neon_cls_s16, i32, i32)
-DEF_HELPER_1(neon_cls_s32, i32, i32)
-DEF_HELPER_1(neon_cnt_u8, i32, i32)
-DEF_HELPER_FLAGS_1(neon_rbit_u8, TCG_CALL_NO_RWG_SE, i32, i32)
-
-DEF_HELPER_3(neon_qdmulh_s16, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrdmulh_s16, i32, env, i32, i32)
-DEF_HELPER_4(neon_qrdmlah_s16, i32, env, i32, i32, i32)
-DEF_HELPER_4(neon_qrdmlsh_s16, i32, env, i32, i32, i32)
-DEF_HELPER_3(neon_qdmulh_s32, i32, env, i32, i32)
-DEF_HELPER_3(neon_qrdmulh_s32, i32, env, i32, i32)
-DEF_HELPER_4(neon_qrdmlah_s32, i32, env, s32, s32, s32)
-DEF_HELPER_4(neon_qrdmlsh_s32, i32, env, s32, s32, s32)
-
-DEF_HELPER_1(neon_narrow_u8, i32, i64)
-DEF_HELPER_1(neon_narrow_u16, i32, i64)
-DEF_HELPER_2(neon_unarrow_sat8, i32, env, i64)
-DEF_HELPER_2(neon_narrow_sat_u8, i32, env, i64)
-DEF_HELPER_2(neon_narrow_sat_s8, i32, env, i64)
-DEF_HELPER_2(neon_unarrow_sat16, i32, env, i64)
-DEF_HELPER_2(neon_narrow_sat_u16, i32, env, i64)
-DEF_HELPER_2(neon_narrow_sat_s16, i32, env, i64)
-DEF_HELPER_2(neon_unarrow_sat32, i32, env, i64)
-DEF_HELPER_2(neon_narrow_sat_u32, i32, env, i64)
-DEF_HELPER_2(neon_narrow_sat_s32, i32, env, i64)
-DEF_HELPER_1(neon_narrow_high_u8, i32, i64)
-DEF_HELPER_1(neon_narrow_high_u16, i32, i64)
-DEF_HELPER_1(neon_narrow_round_high_u8, i32, i64)
-DEF_HELPER_1(neon_narrow_round_high_u16, i32, i64)
-DEF_HELPER_1(neon_widen_u8, i64, i32)
-DEF_HELPER_1(neon_widen_s8, i64, i32)
-DEF_HELPER_1(neon_widen_u16, i64, i32)
-DEF_HELPER_1(neon_widen_s16, i64, i32)
-
-DEF_HELPER_2(neon_addl_u16, i64, i64, i64)
-DEF_HELPER_2(neon_addl_u32, i64, i64, i64)
-DEF_HELPER_2(neon_paddl_u16, i64, i64, i64)
-DEF_HELPER_2(neon_paddl_u32, i64, i64, i64)
-DEF_HELPER_2(neon_subl_u16, i64, i64, i64)
-DEF_HELPER_2(neon_subl_u32, i64, i64, i64)
-DEF_HELPER_3(neon_addl_saturate_s32, i64, env, i64, i64)
-DEF_HELPER_3(neon_addl_saturate_s64, i64, env, i64, i64)
-DEF_HELPER_2(neon_abdl_u16, i64, i32, i32)
-DEF_HELPER_2(neon_abdl_s16, i64, i32, i32)
-DEF_HELPER_2(neon_abdl_u32, i64, i32, i32)
-DEF_HELPER_2(neon_abdl_s32, i64, i32, i32)
-DEF_HELPER_2(neon_abdl_u64, i64, i32, i32)
-DEF_HELPER_2(neon_abdl_s64, i64, i32, i32)
-DEF_HELPER_2(neon_mull_u8, i64, i32, i32)
-DEF_HELPER_2(neon_mull_s8, i64, i32, i32)
-DEF_HELPER_2(neon_mull_u16, i64, i32, i32)
-DEF_HELPER_2(neon_mull_s16, i64, i32, i32)
-
-DEF_HELPER_1(neon_negl_u16, i64, i64)
-DEF_HELPER_1(neon_negl_u32, i64, i64)
-
-DEF_HELPER_FLAGS_2(neon_qabs_s8, TCG_CALL_NO_RWG, i32, env, i32)
-DEF_HELPER_FLAGS_2(neon_qabs_s16, TCG_CALL_NO_RWG, i32, env, i32)
-DEF_HELPER_FLAGS_2(neon_qabs_s32, TCG_CALL_NO_RWG, i32, env, i32)
-DEF_HELPER_FLAGS_2(neon_qabs_s64, TCG_CALL_NO_RWG, i64, env, i64)
-DEF_HELPER_FLAGS_2(neon_qneg_s8, TCG_CALL_NO_RWG, i32, env, i32)
-DEF_HELPER_FLAGS_2(neon_qneg_s16, TCG_CALL_NO_RWG, i32, env, i32)
-DEF_HELPER_FLAGS_2(neon_qneg_s32, TCG_CALL_NO_RWG, i32, env, i32)
-DEF_HELPER_FLAGS_2(neon_qneg_s64, TCG_CALL_NO_RWG, i64, env, i64)
-
-DEF_HELPER_3(neon_ceq_f32, i32, i32, i32, ptr)
-DEF_HELPER_3(neon_cge_f32, i32, i32, i32, ptr)
-DEF_HELPER_3(neon_cgt_f32, i32, i32, i32, ptr)
-DEF_HELPER_3(neon_acge_f32, i32, i32, i32, ptr)
-DEF_HELPER_3(neon_acgt_f32, i32, i32, i32, ptr)
-DEF_HELPER_3(neon_acge_f64, i64, i64, i64, ptr)
-DEF_HELPER_3(neon_acgt_f64, i64, i64, i64, ptr)
-
-/* iwmmxt_helper.c */
-DEF_HELPER_2(iwmmxt_maddsq, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_madduq, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_sadb, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_sadw, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_mulslw, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_mulshw, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_mululw, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_muluhw, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_macsw, i64, i64, i64)
-DEF_HELPER_2(iwmmxt_macuw, i64, i64, i64)
-DEF_HELPER_1(iwmmxt_setpsr_nz, i32, i64)
-
-#define DEF_IWMMXT_HELPER_SIZE_ENV(name) \
-DEF_HELPER_3(iwmmxt_##name##b, i64, env, i64, i64) \
-DEF_HELPER_3(iwmmxt_##name##w, i64, env, i64, i64) \
-DEF_HELPER_3(iwmmxt_##name##l, i64, env, i64, i64) \
-
-DEF_IWMMXT_HELPER_SIZE_ENV(unpackl)
-DEF_IWMMXT_HELPER_SIZE_ENV(unpackh)
-
-DEF_HELPER_2(iwmmxt_unpacklub, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackluw, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpacklul, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackhub, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackhuw, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackhul, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpacklsb, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpacklsw, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpacklsl, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackhsb, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackhsw, i64, env, i64)
-DEF_HELPER_2(iwmmxt_unpackhsl, i64, env, i64)
-
-DEF_IWMMXT_HELPER_SIZE_ENV(cmpeq)
-DEF_IWMMXT_HELPER_SIZE_ENV(cmpgtu)
-DEF_IWMMXT_HELPER_SIZE_ENV(cmpgts)
-
-DEF_IWMMXT_HELPER_SIZE_ENV(mins)
-DEF_IWMMXT_HELPER_SIZE_ENV(minu)
-DEF_IWMMXT_HELPER_SIZE_ENV(maxs)
-DEF_IWMMXT_HELPER_SIZE_ENV(maxu)
-
-DEF_IWMMXT_HELPER_SIZE_ENV(subn)
-DEF_IWMMXT_HELPER_SIZE_ENV(addn)
-DEF_IWMMXT_HELPER_SIZE_ENV(subu)
-DEF_IWMMXT_HELPER_SIZE_ENV(addu)
-DEF_IWMMXT_HELPER_SIZE_ENV(subs)
-DEF_IWMMXT_HELPER_SIZE_ENV(adds)
-
-DEF_HELPER_3(iwmmxt_avgb0, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_avgb1, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_avgw0, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_avgw1, i64, env, i64, i64)
-
-DEF_HELPER_3(iwmmxt_align, i64, i64, i64, i32)
-DEF_HELPER_4(iwmmxt_insr, i64, i64, i32, i32, i32)
-
-DEF_HELPER_1(iwmmxt_bcstb, i64, i32)
-DEF_HELPER_1(iwmmxt_bcstw, i64, i32)
-DEF_HELPER_1(iwmmxt_bcstl, i64, i32)
-
-DEF_HELPER_1(iwmmxt_addcb, i64, i64)
-DEF_HELPER_1(iwmmxt_addcw, i64, i64)
-DEF_HELPER_1(iwmmxt_addcl, i64, i64)
-
-DEF_HELPER_1(iwmmxt_msbb, i32, i64)
-DEF_HELPER_1(iwmmxt_msbw, i32, i64)
-DEF_HELPER_1(iwmmxt_msbl, i32, i64)
-
-DEF_HELPER_3(iwmmxt_srlw, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_srll, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_srlq, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_sllw, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_slll, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_sllq, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_sraw, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_sral, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_sraq, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_rorw, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_rorl, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_rorq, i64, env, i64, i32)
-DEF_HELPER_3(iwmmxt_shufh, i64, env, i64, i32)
-
-DEF_HELPER_3(iwmmxt_packuw, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_packul, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_packuq, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_packsw, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_packsl, i64, env, i64, i64)
-DEF_HELPER_3(iwmmxt_packsq, i64, env, i64, i64)
-
-DEF_HELPER_3(iwmmxt_muladdsl, i64, i64, i32, i32)
-DEF_HELPER_3(iwmmxt_muladdsw, i64, i64, i32, i32)
-DEF_HELPER_3(iwmmxt_muladdswl, i64, i64, i32, i32)
-
-DEF_HELPER_FLAGS_2(neon_unzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_unzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_qunzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_qunzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_qunzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_zip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_zip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_qzip8, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_qzip16, TCG_CALL_NO_RWG, void, ptr, ptr)
-DEF_HELPER_FLAGS_2(neon_qzip32, TCG_CALL_NO_RWG, void, ptr, ptr)
-
-DEF_HELPER_FLAGS_4(crypto_aese, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_aesd, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(crypto_aesmc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(crypto_aesimc, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(crypto_sha1su0, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha1c, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha1p, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha1m, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(crypto_sha1h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(crypto_sha1su1, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(crypto_sha256h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha256h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(crypto_sha256su0, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha256su1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(crypto_sha512h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha512h2, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(crypto_sha512su0, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sha512su1, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(crypto_sm3tt1a, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sm3tt1b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sm3tt2a, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sm3tt2b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sm3partw1, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sm3partw2, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(crypto_sm4e, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(crypto_sm4ekey, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(crypto_rax1, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
-DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
-
-DEF_HELPER_FLAGS_5(gvec_qrdmlah_s16, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_qrdmlsh_s16, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_qrdmlah_s32, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_qrdmlsh_s32, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(sve2_sqrdmlah_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlsh_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlah_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlsh_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlah_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlsh_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlah_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(sve2_sqrdmlsh_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_sdot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_udot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sdot_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_udot_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_usdot_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_sdot_idx_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_udot_idx_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sdot_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_udot_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sudot_idx_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_usdot_idx_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fcaddh, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fcadds, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fcaddd, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_6(gvec_fcmlah, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_fcmlah_idx, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_fcmlas, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_fcmlad, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(neon_paddh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_pmaxh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_pminh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_padds, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_pmaxs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_pmins, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_sstoh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_sitos, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_ustoh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uitos, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_tosszh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_tosizs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_touszh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_touizs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_vcvt_sf, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_uf, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_fs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_fu, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_vcvt_sh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_uh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_hs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_hu, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_vcvt_rm_ss, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_rm_us, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_rm_sh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vcvt_rm_uh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_vrint_rm_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vrint_rm_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_vrintx_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_vrintx_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_frecpe_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_frecpe_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_frecpe_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_frsqrte_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_frsqrte_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_frsqrte_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_fcgt0_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_fcgt0_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_fcge0_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_fcge0_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_fceq0_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_fceq0_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_fcle0_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_fcle0_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_fclt0_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_fclt0_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fsub_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fsub_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fsub_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmul_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmul_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmul_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fabd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fabd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fceq_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fceq_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fcge_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fcge_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fcgt_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fcgt_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_facge_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_facge_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_facgt_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_facgt_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmax_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmax_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmin_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmin_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmaxnum_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmaxnum_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fminnum_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fminnum_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_recps_nf_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_recps_nf_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_rsqrts_nf_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_rsqrts_nf_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmla_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmla_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmls_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmls_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_vfma_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_vfma_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_vfms_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_vfms_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_ftsmul_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_ftsmul_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_ftsmul_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmul_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmul_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmul_idx_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmla_nf_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmla_nf_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmls_nf_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmls_nf_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_6(gvec_fmla_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_fmla_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_fmla_idx_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_uqadd_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqadd_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqadd_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqadd_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqadd_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqadd_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqadd_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqadd_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqsub_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqsub_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqsub_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uqsub_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqsub_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqsub_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqsub_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sqsub_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_fmlal_a32, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmlal_a64, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmlal_idx_a32, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_fmlal_idx_a64, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_2(frint32_s, TCG_CALL_NO_RWG, f32, f32, ptr)
-DEF_HELPER_FLAGS_2(frint64_s, TCG_CALL_NO_RWG, f32, f32, ptr)
-DEF_HELPER_FLAGS_2(frint32_d, TCG_CALL_NO_RWG, f64, f64, ptr)
-DEF_HELPER_FLAGS_2(frint64_d, TCG_CALL_NO_RWG, f64, f64, ptr)
-
-DEF_HELPER_FLAGS_3(gvec_ceq0_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ceq0_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_clt0_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_clt0_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_cle0_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_cle0_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_cgt0_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_cgt0_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_cge0_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_cge0_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_smulh_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_smulh_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_smulh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_smulh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_umulh_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_umulh_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_umulh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_umulh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_sshl_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_sshl_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_ushl_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_ushl_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_pmul_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_pmull_q, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(neon_pmull_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_ssra_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ssra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ssra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ssra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_usra_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_usra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_usra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_usra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_srshr_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_srshr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_srshr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_srshr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_urshr_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_urshr_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_urshr_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_urshr_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_srsra_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_srsra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_srsra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_srsra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_ursra_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ursra_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ursra_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_ursra_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_sri_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_sri_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_sri_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_sri_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_3(gvec_sli_b, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_sli_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_sli_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-DEF_HELPER_FLAGS_3(gvec_sli_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_sabd_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_sabd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_sabd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_sabd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_uabd_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uabd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uabd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uabd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_saba_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_saba_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_saba_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_saba_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_uaba_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uaba_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uaba_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_uaba_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_mul_idx_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_mul_idx_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(gvec_mul_idx_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_mla_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_mla_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_mla_idx_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_mls_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_mls_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_mls_idx_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(neon_sqdmulh_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_sqdmulh_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(neon_sqrdmulh_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(neon_sqrdmulh_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqdmulh_idx_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_idx_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_idx_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_4(sve2_sqrdmulh_idx_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_6(sve2_fmlal_zzzw_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(sve2_fmlal_zzxw_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_4(gvec_xar_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_smmla_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_ummla_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_usmmla_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_bfdot, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_bfdot_idx, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_bfmmla, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_6(gvec_bfmlal, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_6(gvec_bfmlal_idx, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_sclamp_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sclamp_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sclamp_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_sclamp_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-DEF_HELPER_FLAGS_5(gvec_uclamp_b, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uclamp_h, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uclamp_s, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-DEF_HELPER_FLAGS_5(gvec_uclamp_d, TCG_CALL_NO_RWG,
-                   void, ptr, ptr, ptr, ptr, i32)
-
-#ifdef TARGET_AARCH64
-#include "tcg/helper-a64.h"
-#include "tcg/helper-sve.h"
-#include "tcg/helper-sme.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "cpu.h"
+#include "exec-all.h"
+#include "gdbstub.h"
+#include "helpers.h"
+#include "qemu-common.h"
+
+static uint32_t cortexa8_cp15_c0_c1[8] =
+{ 0x1031, 0x11, 0x400, 0, 0x31100003, 0x20000000, 0x01202000, 0x11 };
+
+static uint32_t cortexa8_cp15_c0_c2[8] =
+{ 0x00101111, 0x12112111, 0x21232031, 0x11112131, 0x00111142, 0, 0, 0 };
+
+static uint32_t mpcore_cp15_c0_c1[8] =
+{ 0x111, 0x1, 0, 0x2, 0x01100103, 0x10020302, 0x01222000, 0 };
+
+static uint32_t mpcore_cp15_c0_c2[8] =
+{ 0x00100011, 0x12002111, 0x11221011, 0x01102131, 0x141, 0, 0, 0 };
+
+static uint32_t arm1136_cp15_c0_c1[8] =
+{ 0x111, 0x1, 0x2, 0x3, 0x01130003, 0x10030302, 0x01222110, 0 };
+
+static uint32_t arm1136_cp15_c0_c2[8] =
+{ 0x00140011, 0x12002111, 0x11231111, 0x01102131, 0x141, 0, 0, 0 };
+
+static uint32_t cpu_arm_find_by_name(const char *name);
+
+static inline void set_feature(CPUARMState *env, int feature)
+{
+    env->features |= 1u << feature;
+}
+
+static void cpu_reset_model_id(CPUARMState *env, uint32_t id)
+{
+    env->cp15.c0_cpuid = id;
+    switch (id) {
+    case ARM_CPUID_ARM920T:
+        set_feature(env, ARM_FEATURE_S3C);
+        env->cp15.c0_cachetype = 0xd172172;
+        env->cp15.c1_sys = 0x00000078;
+        break;
+    case ARM_CPUID_ARM926:
+        set_feature(env, ARM_FEATURE_VFP);
+        env->vfp.xregs[ARM_VFP_FPSID] = 0x41011090;
+        env->cp15.c0_cachetype = 0x1dd20d2;
+        env->cp15.c1_sys = 0x00090078;
+        break;
+    case ARM_CPUID_ARM946:
+        set_feature(env, ARM_FEATURE_MPU);
+        env->cp15.c0_cachetype = 0x0f004006;
+        env->cp15.c1_sys = 0x00000078;
+        break;
+    case ARM_CPUID_ARM1026:
+        set_feature(env, ARM_FEATURE_VFP);
+        set_feature(env, ARM_FEATURE_AUXCR);
+        env->vfp.xregs[ARM_VFP_FPSID] = 0x410110a0;
+        env->cp15.c0_cachetype = 0x1dd20d2;
+        env->cp15.c1_sys = 0x00090078;
+        break;
+    case ARM_CPUID_ARM1136_R2:
+    case ARM_CPUID_ARM1136:
+        set_feature(env, ARM_FEATURE_V6);
+        set_feature(env, ARM_FEATURE_VFP);
+        set_feature(env, ARM_FEATURE_AUXCR);
+        env->vfp.xregs[ARM_VFP_FPSID] = 0x410120b4;
+        env->vfp.xregs[ARM_VFP_MVFR0] = 0x11111111;
+        env->vfp.xregs[ARM_VFP_MVFR1] = 0x00000000;
+        memcpy(env->cp15.c0_c1, arm1136_cp15_c0_c1, 8 * sizeof(uint32_t));
+        memcpy(env->cp15.c0_c2, arm1136_cp15_c0_c2, 8 * sizeof(uint32_t));
+        env->cp15.c0_cachetype = 0x1dd20d2;
+        break;
+    case ARM_CPUID_ARM11MPCORE:
+        set_feature(env, ARM_FEATURE_V6);
+        set_feature(env, ARM_FEATURE_V6K);
+        set_feature(env, ARM_FEATURE_VFP);
+        set_feature(env, ARM_FEATURE_AUXCR);
+        env->vfp.xregs[ARM_VFP_FPSID] = 0x410120b4;
+        env->vfp.xregs[ARM_VFP_MVFR0] = 0x11111111;
+        env->vfp.xregs[ARM_VFP_MVFR1] = 0x00000000;
+        memcpy(env->cp15.c0_c1, mpcore_cp15_c0_c1, 8 * sizeof(uint32_t));
+        memcpy(env->cp15.c0_c2, mpcore_cp15_c0_c2, 8 * sizeof(uint32_t));
+        env->cp15.c0_cachetype = 0x1dd20d2;
+        break;
+    case ARM_CPUID_CORTEXA8:
+        set_feature(env, ARM_FEATURE_V6);
+        set_feature(env, ARM_FEATURE_V6K);
+        set_feature(env, ARM_FEATURE_V7);
+        set_feature(env, ARM_FEATURE_AUXCR);
+        set_feature(env, ARM_FEATURE_THUMB2);
+        set_feature(env, ARM_FEATURE_VFP);
+        set_feature(env, ARM_FEATURE_VFP3);
+        set_feature(env, ARM_FEATURE_NEON);
+        set_feature(env, ARM_FEATURE_THUMB2EE);
+        env->vfp.xregs[ARM_VFP_FPSID] = 0x410330c0;
+        env->vfp.xregs[ARM_VFP_MVFR0] = 0x11110222;
+        env->vfp.xregs[ARM_VFP_MVFR1] = 0x00011100;
+        memcpy(env->cp15.c0_c1, cortexa8_cp15_c0_c1, 8 * sizeof(uint32_t));
+        memcpy(env->cp15.c0_c2, cortexa8_cp15_c0_c2, 8 * sizeof(uint32_t));
+        env->cp15.c0_cachetype = 0x82048004;
+        env->cp15.c0_clid = (1 << 27) | (2 << 24) | 3;
+        env->cp15.c0_ccsid[0] = 0xe007e01a; /* 16k L1 dcache. */
+        env->cp15.c0_ccsid[1] = 0x2007e01a; /* 16k L1 icache. */
+        env->cp15.c0_ccsid[2] = 0xf0000000; /* No L2 icache. */
+        break;
+    case ARM_CPUID_CORTEXM3:
+        set_feature(env, ARM_FEATURE_V6);
+        set_feature(env, ARM_FEATURE_THUMB2);
+        set_feature(env, ARM_FEATURE_V7);
+        set_feature(env, ARM_FEATURE_M);
+        set_feature(env, ARM_FEATURE_DIV);
+        break;
+    case ARM_CPUID_ANY: /* For userspace emulation.  */
+        set_feature(env, ARM_FEATURE_V6);
+        set_feature(env, ARM_FEATURE_V6K);
+        set_feature(env, ARM_FEATURE_V7);
+        set_feature(env, ARM_FEATURE_THUMB2);
+        set_feature(env, ARM_FEATURE_VFP);
+        set_feature(env, ARM_FEATURE_VFP3);
+        set_feature(env, ARM_FEATURE_NEON);
+        set_feature(env, ARM_FEATURE_THUMB2EE);
+        set_feature(env, ARM_FEATURE_DIV);
+        break;
+    case ARM_CPUID_TI915T:
+    case ARM_CPUID_TI925T:
+        set_feature(env, ARM_FEATURE_OMAPCP);
+        env->cp15.c0_cpuid = ARM_CPUID_TI925T; /* Depends on wiring.  */
+        env->cp15.c0_cachetype = 0x5109149;
+        env->cp15.c1_sys = 0x00000070;
+        env->cp15.c15_i_max = 0x000;
+        env->cp15.c15_i_min = 0xff0;
+        break;
+    case ARM_CPUID_PXA250:
+    case ARM_CPUID_PXA255:
+    case ARM_CPUID_PXA260:
+    case ARM_CPUID_PXA261:
+    case ARM_CPUID_PXA262:
+        set_feature(env, ARM_FEATURE_XSCALE);
+        /* JTAG_ID is ((id << 28) | 0x09265013) */
+        env->cp15.c0_cachetype = 0xd172172;
+        env->cp15.c1_sys = 0x00000078;
+        break;
+    case ARM_CPUID_PXA270_A0:
+    case ARM_CPUID_PXA270_A1:
+    case ARM_CPUID_PXA270_B0:
+    case ARM_CPUID_PXA270_B1:
+    case ARM_CPUID_PXA270_C0:
+    case ARM_CPUID_PXA270_C5:
+        set_feature(env, ARM_FEATURE_XSCALE);
+        /* JTAG_ID is ((id << 28) | 0x09265013) */
+        set_feature(env, ARM_FEATURE_IWMMXT);
+        env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
+        env->cp15.c0_cachetype = 0xd172172;
+        env->cp15.c1_sys = 0x00000078;
+        break;
+    default:
+        cpu_abort(env, "Bad CPU ID: %x\n", id);
+        break;
+    }
+}
+
+void cpu_reset(CPUARMState *env)
+{
+    uint32_t id;
+
+    if (qemu_loglevel_mask(CPU_LOG_RESET)) {
+        qemu_log("CPU Reset (CPU %d)\n", env->cpu_index);
+        log_cpu_state(env, 0);
+    }
+
+    id = env->cp15.c0_cpuid;
+    memset(env, 0, offsetof(CPUARMState, breakpoints));
+    if (id)
+        cpu_reset_model_id(env, id);
+#if defined (CONFIG_USER_ONLY)
+    env->uncached_cpsr = ARM_CPU_MODE_USR;
+    env->vfp.xregs[ARM_VFP_FPEXC] = 1 << 30;
+#else
+    /* SVC mode with interrupts disabled.  */
+    env->uncached_cpsr = ARM_CPU_MODE_SVC | CPSR_A | CPSR_F | CPSR_I;
+    /* On ARMv7-M the CPSR_I is the value of the PRIMASK register, and is
+       clear at reset.  */
+    if (IS_M(env))
+        env->uncached_cpsr &= ~CPSR_I;
+    env->vfp.xregs[ARM_VFP_FPEXC] = 0;
+    env->cp15.c2_base_mask = 0xffffc000u;
+#endif
+    env->regs[15] = 0;
+    tlb_flush(env, 1);
+}
+
+static int vfp_gdb_get_reg(CPUState *env, uint8_t *buf, int reg)
+{
+    int nregs;
+
+    /* VFP data registers are always little-endian.  */
+    nregs = arm_feature(env, ARM_FEATURE_VFP3) ? 32 : 16;
+    if (reg < nregs) {
+        stfq_le_p(buf, env->vfp.regs[reg]);
+        return 8;
+    }
+    if (arm_feature(env, ARM_FEATURE_NEON)) {
+        /* Aliases for Q regs.  */
+        nregs += 16;
+        if (reg < nregs) {
+            stfq_le_p(buf, env->vfp.regs[(reg - 32) * 2]);
+            stfq_le_p(buf + 8, env->vfp.regs[(reg - 32) * 2 + 1]);
+            return 16;
+        }
+    }
+    switch (reg - nregs) {
+    case 0: stl_p(buf, env->vfp.xregs[ARM_VFP_FPSID]); return 4;
+    case 1: stl_p(buf, env->vfp.xregs[ARM_VFP_FPSCR]); return 4;
+    case 2: stl_p(buf, env->vfp.xregs[ARM_VFP_FPEXC]); return 4;
+    }
+    return 0;
+}
+
+static int vfp_gdb_set_reg(CPUState *env, uint8_t *buf, int reg)
+{
+    int nregs;
+
+    nregs = arm_feature(env, ARM_FEATURE_VFP3) ? 32 : 16;
+    if (reg < nregs) {
+        env->vfp.regs[reg] = ldfq_le_p(buf);
+        return 8;
+    }
+    if (arm_feature(env, ARM_FEATURE_NEON)) {
+        nregs += 16;
+        if (reg < nregs) {
+            env->vfp.regs[(reg - 32) * 2] = ldfq_le_p(buf);
+            env->vfp.regs[(reg - 32) * 2 + 1] = ldfq_le_p(buf + 8);
+            return 16;
+        }
+    }
+    switch (reg - nregs) {
+    case 0: env->vfp.xregs[ARM_VFP_FPSID] = ldl_p(buf); return 4;
+    case 1: env->vfp.xregs[ARM_VFP_FPSCR] = ldl_p(buf); return 4;
+    case 2: env->vfp.xregs[ARM_VFP_FPEXC] = ldl_p(buf); return 4;
+    }
+    return 0;
+}
+
+CPUARMState *cpu_arm_init(const char *cpu_model)
+{
+    CPUARMState *env;
+    uint32_t id;
+    static int inited = 0;
+
+    id = cpu_arm_find_by_name(cpu_model);
+    if (id == 0)
+        return NULL;
+    env = qemu_mallocz(sizeof(CPUARMState));
+    cpu_exec_init(env);
+    if (!inited) {
+        inited = 1;
+        arm_translate_init();
+    }
+
+    env->cpu_model_str = cpu_model;
+    env->cp15.c0_cpuid = id;
+    cpu_reset(env);
+    if (arm_feature(env, ARM_FEATURE_NEON)) {
+        gdb_register_coprocessor(env, vfp_gdb_get_reg, vfp_gdb_set_reg,
+                                 51, "arm-neon.xml", 0);
+    } else if (arm_feature(env, ARM_FEATURE_VFP3)) {
+        gdb_register_coprocessor(env, vfp_gdb_get_reg, vfp_gdb_set_reg,
+                                 35, "arm-vfp3.xml", 0);
+    } else if (arm_feature(env, ARM_FEATURE_VFP)) {
+        gdb_register_coprocessor(env, vfp_gdb_get_reg, vfp_gdb_set_reg,
+                                 19, "arm-vfp.xml", 0);
+    }
+    qemu_init_vcpu(env);
+    return env;
+}
+
+struct arm_cpu_t {
+    uint32_t id;
+    const char *name;
+};
+
+static const struct arm_cpu_t arm_cpu_names[] = {
+    { ARM_CPUID_ARM920T, "arm920t"},
+    { ARM_CPUID_ARM926, "arm926"},
+    { ARM_CPUID_ARM946, "arm946"},
+    { ARM_CPUID_ARM1026, "arm1026"},
+    { ARM_CPUID_ARM1136, "arm1136"},
+    { ARM_CPUID_ARM1136_R2, "arm1136-r2"},
+    { ARM_CPUID_ARM11MPCORE, "arm11mpcore"},
+    { ARM_CPUID_CORTEXM3, "cortex-m3"},
+    { ARM_CPUID_CORTEXA8, "cortex-a8"},
+    { ARM_CPUID_TI925T, "ti925t" },
+    { ARM_CPUID_PXA250, "pxa250" },
+    { ARM_CPUID_PXA255, "pxa255" },
+    { ARM_CPUID_PXA260, "pxa260" },
+    { ARM_CPUID_PXA261, "pxa261" },
+    { ARM_CPUID_PXA262, "pxa262" },
+    { ARM_CPUID_PXA270, "pxa270" },
+    { ARM_CPUID_PXA270_A0, "pxa270-a0" },
+    { ARM_CPUID_PXA270_A1, "pxa270-a1" },
+    { ARM_CPUID_PXA270_B0, "pxa270-b0" },
+    { ARM_CPUID_PXA270_B1, "pxa270-b1" },
+    { ARM_CPUID_PXA270_C0, "pxa270-c0" },
+    { ARM_CPUID_PXA270_C5, "pxa270-c5" },
+    { ARM_CPUID_ANY, "any"},
+    { 0, NULL}
+};
+
+void arm_cpu_list(FILE *f, int (*cpu_fprintf)(FILE *f, const char *fmt, ...))
+{
+    int i;
+
+    (*cpu_fprintf)(f, "Available CPUs:\n");
+    for (i = 0; arm_cpu_names[i].name; i++) {
+        (*cpu_fprintf)(f, "  %s\n", arm_cpu_names[i].name);
+    }
+}
+
+/* return 0 if not found */
+static uint32_t cpu_arm_find_by_name(const char *name)
+{
+    int i;
+    uint32_t id;
+
+    id = 0;
+    for (i = 0; arm_cpu_names[i].name; i++) {
+        if (strcmp(name, arm_cpu_names[i].name) == 0) {
+            id = arm_cpu_names[i].id;
+            break;
+        }
+    }
+    return id;
+}
+
+void cpu_arm_close(CPUARMState *env)
+{
+    free(env);
+}
+
+uint32_t cpsr_read(CPUARMState *env)
+{
+    int ZF;
+    ZF = (env->ZF == 0);
+    return env->uncached_cpsr | (env->NF & 0x80000000) | (ZF << 30) |
+        (env->CF << 29) | ((env->VF & 0x80000000) >> 3) | (env->QF << 27)
+        | (env->thumb << 5) | ((env->condexec_bits & 3) << 25)
+        | ((env->condexec_bits & 0xfc) << 8)
+        | (env->GE << 16);
+}
+
+void cpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
+{
+    if (mask & CPSR_NZCV) {
+        env->ZF = (~val) & CPSR_Z;
+        env->NF = val;
+        env->CF = (val >> 29) & 1;
+        env->VF = (val << 3) & 0x80000000;
+    }
+    if (mask & CPSR_Q)
+        env->QF = ((val & CPSR_Q) != 0);
+    if (mask & CPSR_T)
+        env->thumb = ((val & CPSR_T) != 0);
+    if (mask & CPSR_IT_0_1) {
+        env->condexec_bits &= ~3;
+        env->condexec_bits |= (val >> 25) & 3;
+    }
+    if (mask & CPSR_IT_2_7) {
+        env->condexec_bits &= 3;
+        env->condexec_bits |= (val >> 8) & 0xfc;
+    }
+    if (mask & CPSR_GE) {
+        env->GE = (val >> 16) & 0xf;
+    }
+
+    if ((env->uncached_cpsr ^ val) & mask & CPSR_M) {
+        switch_mode(env, val & CPSR_M);
+    }
+    mask &= ~CACHED_CPSR_BITS;
+    env->uncached_cpsr = (env->uncached_cpsr & ~mask) | (val & mask);
+}
+
+/* Sign/zero extend */
+uint32_t HELPER(sxtb16)(uint32_t x)
+{
+    uint32_t res;
+    res = (uint16_t)(int8_t)x;
+    res |= (uint32_t)(int8_t)(x >> 16) << 16;
+    return res;
+}
+
+uint32_t HELPER(uxtb16)(uint32_t x)
+{
+    uint32_t res;
+    res = (uint16_t)(uint8_t)x;
+    res |= (uint32_t)(uint8_t)(x >> 16) << 16;
+    return res;
+}
+
+uint32_t HELPER(clz)(uint32_t x)
+{
+    int count;
+    for (count = 32; x; count--)
+        x >>= 1;
+    return count;
+}
+
+int32_t HELPER(sdiv)(int32_t num, int32_t den)
+{
+    if (den == 0)
+      return 0;
+    return num / den;
+}
+
+uint32_t HELPER(udiv)(uint32_t num, uint32_t den)
+{
+    if (den == 0)
+      return 0;
+    return num / den;
+}
+
+uint32_t HELPER(rbit)(uint32_t x)
+{
+    x =  ((x & 0xff000000) >> 24)
+       | ((x & 0x00ff0000) >> 8)
+       | ((x & 0x0000ff00) << 8)
+       | ((x & 0x000000ff) << 24);
+    x =  ((x & 0xf0f0f0f0) >> 4)
+       | ((x & 0x0f0f0f0f) << 4);
+    x =  ((x & 0x88888888) >> 3)
+       | ((x & 0x44444444) >> 1)
+       | ((x & 0x22222222) << 1)
+       | ((x & 0x11111111) << 3);
+    return x;
+}
+
+uint32_t HELPER(abs)(uint32_t x)
+{
+    return ((int32_t)x < 0) ? -x : x;
+}
+
+#if defined(CONFIG_USER_ONLY)
+
+void do_interrupt (CPUState *env)
+{
+    env->exception_index = -1;
+}
+
+/* Structure used to record exclusive memory locations.  */
+typedef struct mmon_state {
+    struct mmon_state *next;
+    CPUARMState *cpu_env;
+    uint32_t addr;
+} mmon_state;
+
+/* Chain of current locks.  */
+static mmon_state* mmon_head = NULL;
+
+int cpu_arm_handle_mmu_fault (CPUState *env, target_ulong address, int rw,
+                              int mmu_idx, int is_softmmu)
+{
+    if (rw == 2) {
+        env->exception_index = EXCP_PREFETCH_ABORT;
+        env->cp15.c6_insn = address;
+    } else {
+        env->exception_index = EXCP_DATA_ABORT;
+        env->cp15.c6_data = address;
+    }
+    return 1;
+}
+
+static void allocate_mmon_state(CPUState *env)
+{
+    env->mmon_entry = malloc(sizeof (mmon_state));
+    memset (env->mmon_entry, 0, sizeof (mmon_state));
+    env->mmon_entry->cpu_env = env;
+    mmon_head = env->mmon_entry;
+}
+
+/* Flush any monitor locks for the specified address.  */
+static void flush_mmon(uint32_t addr)
+{
+    mmon_state *mon;
+
+    for (mon = mmon_head; mon; mon = mon->next)
+      {
+        if (mon->addr != addr)
+          continue;
+
+        mon->addr = 0;
+        break;
+      }
+}
+
+/* Mark an address for exclusive access.  */
+void HELPER(mark_exclusive)(CPUState *env, uint32_t addr)
+{
+    if (!env->mmon_entry)
+        allocate_mmon_state(env);
+    /* Clear any previous locks.  */
+    flush_mmon(addr);
+    env->mmon_entry->addr = addr;
+}
+
+/* Test if an exclusive address is still exclusive.  Returns zero
+   if the address is still exclusive.   */
+uint32_t HELPER(test_exclusive)(CPUState *env, uint32_t addr)
+{
+    int res;
+
+    if (!env->mmon_entry)
+        return 1;
+    if (env->mmon_entry->addr == addr)
+        res = 0;
+    else
+        res = 1;
+    flush_mmon(addr);
+    return res;
+}
+
+void HELPER(clrex)(CPUState *env)
+{
+    if (!(env->mmon_entry && env->mmon_entry->addr))
+        return;
+    flush_mmon(env->mmon_entry->addr);
+}
+
+target_phys_addr_t cpu_get_phys_page_debug(CPUState *env, target_ulong addr)
+{
+    return addr;
+}
+
+/* These should probably raise undefined insn exceptions.  */
+void HELPER(set_cp)(CPUState *env, uint32_t insn, uint32_t val)
+{
+    int op1 = (insn >> 8) & 0xf;
+    cpu_abort(env, "cp%i insn %08x\n", op1, insn);
+    return;
+}
+
+uint32_t HELPER(get_cp)(CPUState *env, uint32_t insn)
+{
+    int op1 = (insn >> 8) & 0xf;
+    cpu_abort(env, "cp%i insn %08x\n", op1, insn);
+    return 0;
+}
+
+void HELPER(set_cp15)(CPUState *env, uint32_t insn, uint32_t val)
+{
+    cpu_abort(env, "cp15 insn %08x\n", insn);
+}
+
+uint32_t HELPER(get_cp15)(CPUState *env, uint32_t insn)
+{
+    cpu_abort(env, "cp15 insn %08x\n", insn);
+    return 0;
+}
+
+/* These should probably raise undefined insn exceptions.  */
+void HELPER(v7m_msr)(CPUState *env, uint32_t reg, uint32_t val)
+{
+    cpu_abort(env, "v7m_mrs %d\n", reg);
+}
+
+uint32_t HELPER(v7m_mrs)(CPUState *env, uint32_t reg)
+{
+    cpu_abort(env, "v7m_mrs %d\n", reg);
+    return 0;
+}
+
+void switch_mode(CPUState *env, int mode)
+{
+    if (mode != ARM_CPU_MODE_USR)
+        cpu_abort(env, "Tried to switch out of user mode\n");
+}
+
+void HELPER(set_r13_banked)(CPUState *env, uint32_t mode, uint32_t val)
+{
+    cpu_abort(env, "banked r13 write\n");
+}
+
+uint32_t HELPER(get_r13_banked)(CPUState *env, uint32_t mode)
+{
+    cpu_abort(env, "banked r13 read\n");
+    return 0;
+}
+
+#else
+
+extern int semihosting_enabled;
+
+/* Map CPU modes onto saved register banks.  */
+static inline int bank_number (int mode)
+{
+    switch (mode) {
+    case ARM_CPU_MODE_USR:
+    case ARM_CPU_MODE_SYS:
+        return 0;
+    case ARM_CPU_MODE_SVC:
+        return 1;
+    case ARM_CPU_MODE_ABT:
+        return 2;
+    case ARM_CPU_MODE_UND:
+        return 3;
+    case ARM_CPU_MODE_IRQ:
+        return 4;
+    case ARM_CPU_MODE_FIQ:
+        return 5;
+    }
+    cpu_abort(cpu_single_env, "Bad mode %x\n", mode);
+    return -1;
+}
+
+void switch_mode(CPUState *env, int mode)
+{
+    int old_mode;
+    int i;
+
+    old_mode = env->uncached_cpsr & CPSR_M;
+    if (mode == old_mode)
+        return;
+
+    if (old_mode == ARM_CPU_MODE_FIQ) {
+        memcpy (env->fiq_regs, env->regs + 8, 5 * sizeof(uint32_t));
+        memcpy (env->regs + 8, env->usr_regs, 5 * sizeof(uint32_t));
+    } else if (mode == ARM_CPU_MODE_FIQ) {
+        memcpy (env->usr_regs, env->regs + 8, 5 * sizeof(uint32_t));
+        memcpy (env->regs + 8, env->fiq_regs, 5 * sizeof(uint32_t));
+    }
+
+    i = bank_number(old_mode);
+    env->banked_r13[i] = env->regs[13];
+    env->banked_r14[i] = env->regs[14];
+    env->banked_spsr[i] = env->spsr;
+
+    i = bank_number(mode);
+    env->regs[13] = env->banked_r13[i];
+    env->regs[14] = env->banked_r14[i];
+    env->spsr = env->banked_spsr[i];
+
+#if 0
+	if (!env->regs[13]) {
+		if (env->cp15.c1_sys & 1) {
+			env->regs[13] = 0x80010000;
+		}
+		else {
+			env->regs[13] = 0x30010000;
+		}
+		printf("%s: SP is NULL, setting to %x\n", __func__, env->regs[13]);
+	}
+#endif
+}
+
+static void v7m_push(CPUARMState *env, uint32_t val)
+{
+    env->regs[13] -= 4;
+    stl_phys(env->regs[13], val);
+}
+
+static uint32_t v7m_pop(CPUARMState *env)
+{
+    uint32_t val;
+    val = ldl_phys(env->regs[13]);
+    env->regs[13] += 4;
+    return val;
+}
+
+/* Switch to V7M main or process stack pointer.  */
+static void switch_v7m_sp(CPUARMState *env, int process)
+{
+    uint32_t tmp;
+    if (env->v7m.current_sp != process) {
+        tmp = env->v7m.other_sp;
+        env->v7m.other_sp = env->regs[13];
+        env->regs[13] = tmp;
+        env->v7m.current_sp = process;
+    }
+}
+
+static void do_v7m_exception_exit(CPUARMState *env)
+{
+    uint32_t type;
+    uint32_t xpsr;
+
+    type = env->regs[15];
+    if (env->v7m.exception != 0)
+        armv7m_nvic_complete_irq(env->v7m.nvic, env->v7m.exception);
+
+    /* Switch to the target stack.  */
+    switch_v7m_sp(env, (type & 4) != 0);
+    /* Pop registers.  */
+    env->regs[0] = v7m_pop(env);
+    env->regs[1] = v7m_pop(env);
+    env->regs[2] = v7m_pop(env);
+    env->regs[3] = v7m_pop(env);
+    env->regs[12] = v7m_pop(env);
+    env->regs[14] = v7m_pop(env);
+    env->regs[15] = v7m_pop(env);
+    xpsr = v7m_pop(env);
+    xpsr_write(env, xpsr, 0xfffffdff);
+    /* Undo stack alignment.  */
+    if (xpsr & 0x200)
+        env->regs[13] |= 4;
+    /* ??? The exception return type specifies Thread/Handler mode.  However
+       this is also implied by the xPSR value. Not sure what to do
+       if there is a mismatch.  */
+    /* ??? Likewise for mismatches between the CONTROL register and the stack
+       pointer.  */
+}
+
+static void do_interrupt_v7m(CPUARMState *env)
+{
+    uint32_t xpsr = xpsr_read(env);
+    uint32_t lr;
+    uint32_t addr;
+
+    lr = 0xfffffff1;
+    if (env->v7m.current_sp)
+        lr |= 4;
+    if (env->v7m.exception == 0)
+        lr |= 8;
+
+    /* For exceptions we just mark as pending on the NVIC, and let that
+       handle it.  */
+    /* TODO: Need to escalate if the current priority is higher than the
+       one we're raising.  */
+    switch (env->exception_index) {
+    case EXCP_UDEF:
+        armv7m_nvic_set_pending(env->v7m.nvic, ARMV7M_EXCP_USAGE);
+        return;
+    case EXCP_SWI:
+        env->regs[15] += 2;
+        armv7m_nvic_set_pending(env->v7m.nvic, ARMV7M_EXCP_SVC);
+        return;
+    case EXCP_PREFETCH_ABORT:
+    case EXCP_DATA_ABORT:
+        armv7m_nvic_set_pending(env->v7m.nvic, ARMV7M_EXCP_MEM);
+        return;
+    case EXCP_BKPT:
+        if (semihosting_enabled) {
+            int nr;
+            nr = lduw_code(env->regs[15]) & 0xff;
+            if (nr == 0xab) {
+                env->regs[15] += 2;
+                env->regs[0] = do_arm_semihosting(env);
+                return;
+            }
+        }
+        armv7m_nvic_set_pending(env->v7m.nvic, ARMV7M_EXCP_DEBUG);
+        return;
+    case EXCP_IRQ:
+        env->v7m.exception = armv7m_nvic_acknowledge_irq(env->v7m.nvic);
+        break;
+    case EXCP_EXCEPTION_EXIT:
+        do_v7m_exception_exit(env);
+        return;
+    default:
+        cpu_abort(env, "Unhandled exception 0x%x\n", env->exception_index);
+        return; /* Never happens.  Keep compiler happy.  */
+    }
+
+    /* Align stack pointer.  */
+    /* ??? Should only do this if Configuration Control Register
+       STACKALIGN bit is set.  */
+    if (env->regs[13] & 4) {
+        env->regs[13] -= 4;
+        xpsr |= 0x200;
+    }
+    /* Switch to the handler mode.  */
+    v7m_push(env, xpsr);
+    v7m_push(env, env->regs[15]);
+    v7m_push(env, env->regs[14]);
+    v7m_push(env, env->regs[12]);
+    v7m_push(env, env->regs[3]);
+    v7m_push(env, env->regs[2]);
+    v7m_push(env, env->regs[1]);
+    v7m_push(env, env->regs[0]);
+    switch_v7m_sp(env, 0);
+    env->uncached_cpsr &= ~CPSR_IT;
+    env->regs[14] = lr;
+    addr = ldl_phys(env->v7m.vecbase + env->v7m.exception * 4);
+    env->regs[15] = addr & 0xfffffffe;
+    env->thumb = addr & 1;
+}
+
+/* Handle a CPU exception.  */
+void do_interrupt(CPUARMState *env)
+{
+    uint32_t addr;
+    uint32_t mask;
+    int new_mode;
+    uint32_t offset;
+
+    if (IS_M(env)) {
+        do_interrupt_v7m(env);
+        return;
+    }
+    /* TODO: Vectored interrupt controller.  */
+    switch (env->exception_index) {
+    case EXCP_UDEF:
+        new_mode = ARM_CPU_MODE_UND;
+        addr = 0x04;
+        mask = CPSR_I;
+        if (env->thumb)
+            offset = 2;
+        else
+            offset = 4;
+        break;
+    case EXCP_SWI:
+        if (semihosting_enabled) {
+            /* Check for semihosting interrupt.  */
+            if (env->thumb) {
+                mask = lduw_code(env->regs[15] - 2) & 0xff;
+            } else {
+                mask = ldl_code(env->regs[15] - 4) & 0xffffff;
+            }
+            /* Only intercept calls from privileged modes, to provide some
+               semblance of security.  */
+            if (((mask == 0x123456 && !env->thumb)
+                    || (mask == 0xab && env->thumb))
+                  && (env->uncached_cpsr & CPSR_M) != ARM_CPU_MODE_USR) {
+                env->regs[0] = do_arm_semihosting(env);
+                return;
+            }
+        }
+        new_mode = ARM_CPU_MODE_SVC;
+        addr = 0x08;
+        mask = CPSR_I;
+        /* The PC already points to the next instruction.  */
+        offset = 0;
+        break;
+    case EXCP_BKPT:
+        /* See if this is a semihosting syscall.  */
+        if (env->thumb && semihosting_enabled) {
+            mask = lduw_code(env->regs[15]) & 0xff;
+            if (mask == 0xab
+                  && (env->uncached_cpsr & CPSR_M) != ARM_CPU_MODE_USR) {
+                env->regs[15] += 2;
+                env->regs[0] = do_arm_semihosting(env);
+                return;
+            }
+        }
+        /* Fall through to prefetch abort.  */
+    case EXCP_PREFETCH_ABORT:
+        new_mode = ARM_CPU_MODE_ABT;
+        addr = 0x0c;
+        mask = CPSR_A | CPSR_I;
+        offset = 4;
+        break;
+    case EXCP_DATA_ABORT:
+        new_mode = ARM_CPU_MODE_ABT;
+        addr = 0x10;
+        mask = CPSR_A | CPSR_I;
+        offset = 8;
+        break;
+    case EXCP_IRQ:
+        new_mode = ARM_CPU_MODE_IRQ;
+        addr = 0x18;
+        /* Disable IRQ and imprecise data aborts.  */
+        mask = CPSR_A | CPSR_I;
+        offset = 4;
+        break;
+    case EXCP_FIQ:
+        new_mode = ARM_CPU_MODE_FIQ;
+        addr = 0x1c;
+        /* Disable FIQ, IRQ and imprecise data aborts.  */
+        mask = CPSR_A | CPSR_I | CPSR_F;
+        offset = 4;
+        break;
+    default:
+        cpu_abort(env, "Unhandled exception 0x%x\n", env->exception_index);
+        return; /* Never happens.  Keep compiler happy.  */
+    }
+    /* High vectors.  */
+    if (env->cp15.c1_sys & (1 << 13)) {
+        addr += 0xffff0000;
+    }
+    switch_mode (env, new_mode);
+    env->spsr = cpsr_read(env);
+    /* Clear IT bits.  */
+    env->condexec_bits = 0;
+    /* Switch to the new mode, and switch to Arm mode.  */
+    /* ??? Thumb interrupt handlers not implemented.  */
+    env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
+    env->uncached_cpsr |= mask;
+    env->thumb = 0;
+    env->regs[14] = env->regs[15] + offset;
+    env->regs[15] = addr;
+    env->interrupt_request |= CPU_INTERRUPT_EXITTB;
+}
+
+/* Check section/page access permissions.
+   Returns the page protection flags, or zero if the access is not
+   permitted.  */
+static inline int check_ap(CPUState *env, int ap, int domain, int access_type,
+                           int is_user)
+{
+  int prot_ro;
+
+  if (domain == 3)
+    return PAGE_READ | PAGE_WRITE;
+
+  if (access_type == 1)
+      prot_ro = 0;
+  else
+      prot_ro = PAGE_READ;
+
+  switch (ap) {
+  case 0:
+      if (access_type == 1)
+          return 0;
+      switch ((env->cp15.c1_sys >> 8) & 3) {
+      case 1:
+          return is_user ? 0 : PAGE_READ;
+      case 2:
+          return PAGE_READ;
+      default:
+          return 0;
+      }
+  case 1:
+      return is_user ? 0 : PAGE_READ | PAGE_WRITE;
+  case 2:
+      if (is_user)
+          return prot_ro;
+      else
+          return PAGE_READ | PAGE_WRITE;
+  case 3:
+      return PAGE_READ | PAGE_WRITE;
+  case 4: /* Reserved.  */
+      return 0;
+  case 5:
+      return is_user ? 0 : prot_ro;
+  case 6:
+      return prot_ro;
+  case 7:
+      if (!arm_feature (env, ARM_FEATURE_V7))
+          return 0;
+      return prot_ro;
+  default:
+      abort();
+  }
+}
+
+static uint32_t get_level1_table_address(CPUState *env, uint32_t address)
+{
+    uint32_t table;
+
+    if (address & env->cp15.c2_mask)
+        table = env->cp15.c2_base1 & 0xffffc000;
+    else
+        table = env->cp15.c2_base0 & env->cp15.c2_base_mask;
+
+    table |= (address >> 18) & 0x3ffc;
+    return table;
+}
+
+static int 
+get_phys_addr_v5(CPUState * env, uint32_t address, int access_type,
+		 int is_user, uint32_t * phys_ptr, int *prot)
+{
+	int		code;
+	uint32_t	table;
+	uint32_t	desc;
+	int		type;
+	int		ap;
+	int		domain;
+	uint32_t	phys_addr;
+
+	/* Pagetable walk.  */
+	/* Lookup l1 descriptor.  */
+	table = get_level1_table_address(env, address);
+	desc = ldl_phys(table);
+	type = (desc & 3);
+	domain = (env->cp15.c3 >> ((desc >> 4) & 0x1e)) & 3;
+	if (type == 0) {
+		/* Section translation fault.  */
+		code = 5;
+		goto do_fault;
+	}
+	if (domain == 0 || domain == 2) {
+		if (type == 2)
+			code = 9;	/* Section domain fault.  */
+		else
+			code = 11;	/* Page domain fault.  */
+		goto do_fault;
+	}
+	if (type == 2) {
+		/* 1Mb section.  */
+		phys_addr = (desc & 0xfff00000) | (address & 0x000fffff);
+		ap = (desc >> 10) & 3;
+		code = 13;
+	} else {
+		/* Lookup l2 entry.  */
+		if (type == 1) {
+			/* Coarse pagetable.  */
+			table = (desc & 0xfffffc00) | ((address >> 10) & 0x3fc);
+		} else {
+			/* Fine pagetable.  */
+			table = (desc & 0xfffff000) | ((address >> 8) & 0xffc);
+		}
+		desc = ldl_phys(table);
+		switch (desc & 3) {
+		case 0:	/* Page translation fault.  */
+			code = 7;
+			goto do_fault;
+		case 1:	/* 64k page.  */
+			phys_addr = (desc & 0xffff0000) | (address & 0xffff);
+			ap = (desc >> (4 + ((address >> 13) & 6))) & 3;
+			break;
+		case 2:	/* 4k page.  */
+			phys_addr = (desc & 0xfffff000) | (address & 0xfff);
+			ap = (desc >> (4 + ((address >> 13) & 6))) & 3;
+			break;
+		case 3:	/* 1k page.  */
+			if (type == 1) {
+				if (arm_feature(env, ARM_FEATURE_XSCALE)) {
+					phys_addr = (desc & 0xfffff000) | (address & 0xfff);
+				} else {
+					/* Page translation fault.  */
+					code = 7;
+					goto do_fault;
+				}
+			} else {
+				phys_addr = (desc & 0xfffffc00) | (address & 0x3ff);
+			}
+			ap = (desc >> 4) & 3;
+			break;
+		default:
+			/*
+			 * Never happens, but compiler isn't smart enough to
+			 * tell.
+			 */
+			abort();
+		}
+		code = 15;
+	}
+	*prot = check_ap(env, ap, domain, access_type, is_user);
+	*phys_ptr = phys_addr;
+	if (!*prot) {
+		/* Access permission fault.  */
+		goto do_fault;
+	}
+	return 0;
+do_fault:
+	return code | (domain << 4);
+}
+
+static int get_phys_addr_v6(CPUState *env, uint32_t address, int access_type,
+			    int is_user, uint32_t *phys_ptr, int *prot)
+{
+    int code;
+    uint32_t table;
+    uint32_t desc;
+    uint32_t xn;
+    int type;
+    int ap;
+    int domain;
+    uint32_t phys_addr;
+
+    /* Pagetable walk.  */
+    /* Lookup l1 descriptor.  */
+    table = get_level1_table_address(env, address);
+    desc = ldl_phys(table);
+    type = (desc & 3);
+    if (type == 0) {
+        /* Section translation fault.  */
+        code = 5;
+        domain = 0;
+        goto do_fault;
+    } else if (type == 2 && (desc & (1 << 18))) {
+        /* Supersection.  */
+        domain = 0;
+    } else {
+        /* Section or page.  */
+        domain = (desc >> 4) & 0x1e;
+    }
+    domain = (env->cp15.c3 >> domain) & 3;
+    if (domain == 0 || domain == 2) {
+        if (type == 2)
+            code = 9; /* Section domain fault.  */
+        else
+            code = 11; /* Page domain fault.  */
+        goto do_fault;
+    }
+    if (type == 2) {
+        if (desc & (1 << 18)) {
+            /* Supersection.  */
+            phys_addr = (desc & 0xff000000) | (address & 0x00ffffff);
+        } else {
+            /* Section.  */
+            phys_addr = (desc & 0xfff00000) | (address & 0x000fffff);
+        }
+        ap = ((desc >> 10) & 3) | ((desc >> 13) & 4);
+        xn = desc & (1 << 4);
+        code = 13;
+    } else {
+        /* Lookup l2 entry.  */
+        table = (desc & 0xfffffc00) | ((address >> 10) & 0x3fc);
+        desc = ldl_phys(table);
+        ap = ((desc >> 4) & 3) | ((desc >> 7) & 4);
+        switch (desc & 3) {
+        case 0: /* Page translation fault.  */
+            code = 7;
+            goto do_fault;
+        case 1: /* 64k page.  */
+            phys_addr = (desc & 0xffff0000) | (address & 0xffff);
+            xn = desc & (1 << 15);
+            break;
+        case 2: case 3: /* 4k page.  */
+            phys_addr = (desc & 0xfffff000) | (address & 0xfff);
+            xn = desc & 1;
+            break;
+        default:
+            /* Never happens, but compiler isn't smart enough to tell.  */
+            abort();
+        }
+        code = 15;
+    }
+    if (xn && access_type == 2)
+        goto do_fault;
+
+    /* The simplified model uses AP[0] as an access control bit.  */
+    if ((env->cp15.c1_sys & (1 << 29)) && (ap & 1) == 0) {
+        /* Access flag fault.  */
+        code = (code == 15) ? 6 : 3;
+        goto do_fault;
+    }
+    *prot = check_ap(env, ap, domain, access_type, is_user);
+    *phys_ptr = phys_addr;
+    if (!*prot && !*phys_ptr) {
+        /* Access permission fault.  */
+        goto do_fault;
+    }
+    return 0;
+do_fault:
+    return code | (domain << 4);
+}
+
+static int get_phys_addr_mpu(CPUState *env, uint32_t address, int access_type,
+			     int is_user, uint32_t *phys_ptr, int *prot)
+{
+    int n;
+    uint32_t mask;
+    uint32_t base;
+
+    *phys_ptr = address;
+    for (n = 7; n >= 0; n--) {
+	base = env->cp15.c6_region[n];
+	if ((base & 1) == 0)
+	    continue;
+	mask = 1 << ((base >> 1) & 0x1f);
+	/* Keep this shift separate from the above to avoid an
+	   (undefined) << 32.  */
+	mask = (mask << 1) - 1;
+	if (((base ^ address) & ~mask) == 0)
+	    break;
+    }
+    if (n < 0)
+	return 2;
+
+    if (access_type == 2) {
+	mask = env->cp15.c5_insn;
+    } else {
+	mask = env->cp15.c5_data;
+    }
+    mask = (mask >> (n * 4)) & 0xf;
+    switch (mask) {
+    case 0:
+	return 1;
+    case 1:
+	if (is_user)
+	  return 1;
+	*prot = PAGE_READ | PAGE_WRITE;
+	break;
+    case 2:
+	*prot = PAGE_READ;
+	if (!is_user)
+	    *prot |= PAGE_WRITE;
+	break;
+    case 3:
+	*prot = PAGE_READ | PAGE_WRITE;
+	break;
+    case 5:
+	if (is_user)
+	    return 1;
+	*prot = PAGE_READ;
+	break;
+    case 6:
+	*prot = PAGE_READ;
+	break;
+    default:
+	/* Bad permission.  */
+	return 1;
+    }
+    return 0;
+}
+
+static inline int get_phys_addr(CPUState *env, uint32_t address,
+                                int access_type, int is_user,
+                                uint32_t *phys_ptr, int *prot)
+{
+    /* Fast Context Switch Extension.  */
+    if (address < 0x02000000)
+        address += env->cp15.c13_fcse;
+
+    if ((env->cp15.c1_sys & 1) == 0) {
+        /* MMU/MPU disabled.  */
+        *phys_ptr = address;
+        *prot = PAGE_READ | PAGE_WRITE;
+        return 0;
+    } else if (arm_feature(env, ARM_FEATURE_MPU)) {
+	return get_phys_addr_mpu(env, address, access_type, is_user, phys_ptr,
+				 prot);
+    } else if (env->cp15.c1_sys & (1 << 23)) {
+        return get_phys_addr_v6(env, address, access_type, is_user, phys_ptr,
+                                prot);
+    } else {
+        return get_phys_addr_v5(env, address, access_type, is_user, phys_ptr,
+                                prot);
+    }
+}
+
+int cpu_arm_handle_mmu_fault (CPUState *env, target_ulong address,
+                              int access_type, int mmu_idx, int is_softmmu)
+{
+    uint32_t phys_addr;
+    int prot;
+    int ret, is_user;
+	
+    is_user = mmu_idx == MMU_USER_IDX;
+    ret = get_phys_addr(env, address, access_type, is_user, &phys_addr, &prot);
+
+	if ((address & 0xff000000) == 0xff000000) {
+		prot = PAGE_READ | PAGE_WRITE;
+		ret = 0;
+	}
+
+    if (ret == 0) {
+        /* Map a single [sub]page.  */
+        phys_addr &= ~(uint32_t)0x3ff;
+        address &= ~(uint32_t)0x3ff;
+        return tlb_set_page (env, address, phys_addr, prot, mmu_idx,
+                             is_softmmu);
+    }
+	
+	//printf("%s: address=%x code=%x\n", __func__, address, ret);
+	if ((address & 0xffffffff) > 0xffff0000) {
+		int i;
+		for (i = 0; i < 16; i++) {
+			printf("R%02d=0x%08x\n", i, env->regs[i]);
+		}
+		exit(-1);
+	}
+
+    if (access_type == 2) {
+        env->cp15.c5_insn = ret;
+        env->cp15.c6_insn = address;
+        env->exception_index = EXCP_PREFETCH_ABORT;
+    } else {
+        env->cp15.c5_data = ret;
+        if (access_type == 1 && arm_feature(env, ARM_FEATURE_V6))
+            env->cp15.c5_data |= (1 << 11);
+        env->cp15.c6_data = address;
+        env->exception_index = EXCP_DATA_ABORT;
+    }
+    return 1;
+}
+
+target_phys_addr_t cpu_get_phys_page_debug(CPUState *env, target_ulong addr)
+{
+    uint32_t phys_addr;
+    int prot;
+    int ret;
+
+    ret = get_phys_addr(env, addr, 0, 0, &phys_addr, &prot);
+
+    if (ret != 0)
+        return -1;
+
+    return phys_addr;
+}
+
+/* Not really implemented.  Need to figure out a sane way of doing this.
+   Maybe add generic watchpoint support and use that.  */
+
+void HELPER(mark_exclusive)(CPUState *env, uint32_t addr)
+{
+    env->mmon_addr = addr;
+}
+
+uint32_t HELPER(test_exclusive)(CPUState *env, uint32_t addr)
+{
+    return (env->mmon_addr != addr);
+}
+
+void HELPER(clrex)(CPUState *env)
+{
+    env->mmon_addr = -1;
+}
+
+void HELPER(set_cp)(CPUState *env, uint32_t insn, uint32_t val)
+{
+    int cp_num = (insn >> 8) & 0xf;
+    int cp_info = (insn >> 5) & 7;
+    int src = (insn >> 16) & 0xf;
+    int operand = insn & 0xf;
+
+    if (env->cp[cp_num].cp_write)
+        env->cp[cp_num].cp_write(env->cp[cp_num].opaque,
+                                 cp_info, src, operand, val);
+}
+
+uint32_t HELPER(get_cp)(CPUState *env, uint32_t insn)
+{
+    int cp_num = (insn >> 8) & 0xf;
+    int cp_info = (insn >> 5) & 7;
+    int dest = (insn >> 16) & 0xf;
+    int operand = insn & 0xf;
+
+    if (env->cp[cp_num].cp_read)
+        return env->cp[cp_num].cp_read(env->cp[cp_num].opaque,
+                                       cp_info, dest, operand);
+    return 0;
+}
+
+/* Return basic MPU access permission bits.  */
+static uint32_t simple_mpu_ap_bits(uint32_t val)
+{
+    uint32_t ret;
+    uint32_t mask;
+    int i;
+    ret = 0;
+    mask = 3;
+    for (i = 0; i < 16; i += 2) {
+        ret |= (val >> i) & mask;
+        mask <<= 2;
+    }
+    return ret;
+}
+
+/* Pad basic MPU access permission bits to extended format.  */
+static uint32_t extended_mpu_ap_bits(uint32_t val)
+{
+    uint32_t ret;
+    uint32_t mask;
+    int i;
+    ret = 0;
+    mask = 3;
+    for (i = 0; i < 16; i += 2) {
+        ret |= (val & mask) << i;
+        mask <<= 2;
+    }
+    return ret;
+}
+
+void HELPER(set_cp15)(CPUState *env, uint32_t insn, uint32_t val)
+{
+    int op1;
+    int op2;
+    int crm;
+
+    op1 = (insn >> 21) & 7;
+    op2 = (insn >> 5) & 7;
+    crm = insn & 0xf;
+    switch ((insn >> 16) & 0xf) {
+    case 0:
+        /* ID codes.  */
+        if (arm_feature(env, ARM_FEATURE_XSCALE))
+            break;
+        if (arm_feature(env, ARM_FEATURE_OMAPCP))
+            break;
+        if (arm_feature(env, ARM_FEATURE_V7)
+                && op1 == 2 && crm == 0 && op2 == 0) {
+            env->cp15.c0_cssel = val & 0xf;
+            break;
+        }
+        goto bad_reg;
+    case 1: /* System configuration.  */
+        if (arm_feature(env, ARM_FEATURE_OMAPCP))
+            op2 = 0;
+        switch (op2) {
+        case 0:
+            if (!arm_feature(env, ARM_FEATURE_XSCALE) || crm == 0)
+                env->cp15.c1_sys = val;
+
+            /* ??? Lots of these bits are not implemented.  */
+            /* This may enable/disable the MMU, so do a TLB flush.  */
+            tlb_flush(env, 1);
+            break;
+        case 1: /* Auxiliary cotrol register.  */
+            if (arm_feature(env, ARM_FEATURE_XSCALE)) {
+                env->cp15.c1_xscaleauxcr = val;
+                break;
+            }
+            /* Not implemented.  */
+            break;
+        case 2:
+            if (arm_feature(env, ARM_FEATURE_XSCALE))
+                goto bad_reg;
+            if (env->cp15.c1_coproc != val) {
+                env->cp15.c1_coproc = val;
+                /* ??? Is this safe when called from within a TB?  */
+                tb_flush(env);
+            }
+            break;
+        default:
+            goto bad_reg;
+        }
+        break;
+    case 2: /* MMU Page table control / MPU cache control.  */
+        if (arm_feature(env, ARM_FEATURE_MPU)) {
+            switch (op2) {
+            case 0:
+                env->cp15.c2_data = val;
+                break;
+            case 1:
+                env->cp15.c2_insn = val;
+                break;
+            default:
+                goto bad_reg;
+            }
+        } else {
+	    switch (op2) {
+	    case 0:
+		env->cp15.c2_base0 = val;
+		break;
+	    case 1:
+		env->cp15.c2_base1 = val;
+		break;
+	    case 2:
+                val &= 7;
+                env->cp15.c2_control = val;
+		env->cp15.c2_mask = ~(((uint32_t)0xffffffffu) >> val);
+                env->cp15.c2_base_mask = ~((uint32_t)0x3fffu >> val);
+		break;
+	    default:
+		goto bad_reg;
+	    }
+        }
+        break;
+    case 3: /* MMU Domain access control / MPU write buffer control.  */
+        env->cp15.c3 = val;
+        tlb_flush(env, 1); /* Flush TLB as domain not tracked in TLB */
+        break;
+    case 4: /* Reserved.  */
+        goto bad_reg;
+    case 5: /* MMU Fault status / MPU access permission.  */
+        if (arm_feature(env, ARM_FEATURE_OMAPCP))
+            op2 = 0;
+        switch (op2) {
+        case 0:
+            if (arm_feature(env, ARM_FEATURE_MPU))
+                val = extended_mpu_ap_bits(val);
+            env->cp15.c5_data = val;
+            break;
+        case 1:
+            if (arm_feature(env, ARM_FEATURE_MPU))
+                val = extended_mpu_ap_bits(val);
+            env->cp15.c5_insn = val;
+            break;
+        case 2:
+            if (!arm_feature(env, ARM_FEATURE_MPU))
+                goto bad_reg;
+            env->cp15.c5_data = val;
+            break;
+        case 3:
+            if (!arm_feature(env, ARM_FEATURE_MPU))
+                goto bad_reg;
+            env->cp15.c5_insn = val;
+            break;
+        default:
+            goto bad_reg;
+        }
+        break;
+    case 6: /* MMU Fault address / MPU base/size.  */
+        if (arm_feature(env, ARM_FEATURE_MPU)) {
+            if (crm >= 8)
+                goto bad_reg;
+            env->cp15.c6_region[crm] = val;
+        } else {
+            if (arm_feature(env, ARM_FEATURE_OMAPCP))
+                op2 = 0;
+            switch (op2) {
+            case 0:
+                env->cp15.c6_data = val;
+                break;
+            case 1: /* ??? This is WFAR on armv6 */
+            case 2:
+                env->cp15.c6_insn = val;
+                break;
+            default:
+                goto bad_reg;
+            }
+        }
+        break;
+    case 7: /* Cache control.  */
+        env->cp15.c15_i_max = 0x000;
+        env->cp15.c15_i_min = 0xff0;
+        /* No cache, so nothing to do.  */
+        /* ??? MPCore has VA to PA translation functions.  */
+        break;
+    case 8: /* MMU TLB control.  */
+        switch (op2) {
+        case 0: /* Invalidate all.  */
+            tlb_flush(env, 0);
+            break;
+        case 1: /* Invalidate single TLB entry.  */
+#if 0
+            /* ??? This is wrong for large pages and sections.  */
+            /* As an ugly hack to make linux work we always flush a 4K
+               pages.  */
+            val &= 0xfffff000;
+            tlb_flush_page(env, val);
+            tlb_flush_page(env, val + 0x400);
+            tlb_flush_page(env, val + 0x800);
+            tlb_flush_page(env, val + 0xc00);
+#else
+            tlb_flush(env, 1);
+#endif
+            break;
+        case 2: /* Invalidate on ASID.  */
+            tlb_flush(env, val == 0);
+            break;
+        case 3: /* Invalidate single entry on MVA.  */
+            /* ??? This is like case 1, but ignores ASID.  */
+            tlb_flush(env, 1);
+            break;
+        default:
+            goto bad_reg;
+        }
+        break;
+    case 9:
+        if (arm_feature(env, ARM_FEATURE_OMAPCP))
+            break;
+        switch (crm) {
+        case 0: /* Cache lockdown.  */
+	    switch (op1) {
+	    case 0: /* L1 cache.  */
+		switch (op2) {
+		case 0:
+		    env->cp15.c9_data = val;
+		    break;
+		case 1:
+		    env->cp15.c9_insn = val;
+		    break;
+		default:
+		    goto bad_reg;
+		}
+		break;
+	    case 1: /* L2 cache.  */
+		/* Ignore writes to L2 lockdown/auxiliary registers.  */
+		break;
+	    default:
+		goto bad_reg;
+	    }
+	    break;
+        case 1: /* TCM memory region registers.  */
+            /* Not implemented.  */
+            goto bad_reg;
+        default:
+            goto bad_reg;
+        }
+        break;
+    case 10: /* MMU TLB lockdown.  */
+        /* ??? TLB lockdown not implemented.  */
+        break;
+    case 12: /* Reserved.  */
+        goto bad_reg;
+    case 13: /* Process ID.  */
+        if (arm_feature(env, ARM_FEATURE_S3C))
+            op2 = 0;
+        switch (op2) {
+        case 0:
+            /* Unlike real hardware the qemu TLB uses virtual addresses,
+               not modified virtual addresses, so this causes a TLB flush.
+             */
+            if (env->cp15.c13_fcse != val)
+              tlb_flush(env, 1);
+            env->cp15.c13_fcse = val;
+            break;
+        case 1:
+            /* This changes the ASID, so do a TLB flush.  */
+            if (env->cp15.c13_context != val
+                && !arm_feature(env, ARM_FEATURE_MPU))
+              tlb_flush(env, 0);
+            env->cp15.c13_context = val;
+            break;
+        case 2:
+            env->cp15.c13_tls1 = val;
+            break;
+        case 3:
+            env->cp15.c13_tls2 = val;
+            break;
+        case 4:
+            env->cp15.c13_tls3 = val;
+            break;
+        default:
+            goto bad_reg;
+        }
+        break;
+    case 14: /* Reserved.  */
+        goto bad_reg;
+    case 15: /* Implementation specific.  */
+        if (arm_feature(env, ARM_FEATURE_XSCALE)) {
+            if (op2 == 0 && crm == 1) {
+                if (env->cp15.c15_cpar != (val & 0x3fff)) {
+                    /* Changes cp0 to cp13 behavior, so needs a TB flush.  */
+                    tb_flush(env);
+                    env->cp15.c15_cpar = val & 0x3fff;
+                }
+                break;
+            }
+            goto bad_reg;
+        }
+        if (arm_feature(env, ARM_FEATURE_OMAPCP)) {
+            switch (crm) {
+            case 0:
+                break;
+            case 1: /* Set TI925T configuration.  */
+                env->cp15.c15_ticonfig = val & 0xe7;
+                env->cp15.c0_cpuid = (val & (1 << 5)) ? /* OS_TYPE bit */
+                        ARM_CPUID_TI915T : ARM_CPUID_TI925T;
+                break;
+            case 2: /* Set I_max.  */
+                env->cp15.c15_i_max = val;
+                break;
+            case 3: /* Set I_min.  */
+                env->cp15.c15_i_min = val;
+                break;
+            case 4: /* Set thread-ID.  */
+                env->cp15.c15_threadid = val & 0xffff;
+                break;
+            case 8: /* Wait-for-interrupt (deprecated).  */
+                cpu_interrupt(env, CPU_INTERRUPT_HALT);
+                break;
+            default:
+                goto bad_reg;
+            }
+        }
+        break;
+    }
+    return;
+bad_reg:
+    /* ??? For debugging only.  Should raise illegal instruction exception.  */
+    cpu_abort(env, "Unimplemented cp15 register write (c%d, c%d, {%d, %d})\n",
+              (insn >> 16) & 0xf, crm, op1, op2);
+}
+
+uint32_t HELPER(get_cp15)(CPUState *env, uint32_t insn)
+{
+    int op1;
+    int op2;
+    int crm;
+
+    op1 = (insn >> 21) & 7;
+    op2 = (insn >> 5) & 7;
+    crm = insn & 0xf;
+    switch ((insn >> 16) & 0xf) {
+    case 0: /* ID codes.  */
+        switch (op1) {
+        case 0:
+            switch (crm) {
+            case 0:
+                switch (op2) {
+                case 0: /* Device ID.  */
+                    return env->cp15.c0_cpuid;
+                case 1: /* Cache Type.  */
+		    return env->cp15.c0_cachetype;
+                case 2: /* TCM status.  */
+                    if (arm_feature(env, ARM_FEATURE_S3C))
+                        return env->cp15.c0_cpuid;
+                    return 0;
+                case 3: /* TLB type register.  */
+                    return 0; /* No lockable TLB entries.  */
+                case 5: /* CPU ID */
+                    return env->cpu_index;
+                default:
+                    goto bad_reg;
+                }
+            case 1:
+                if (!arm_feature(env, ARM_FEATURE_V6))
+                    goto bad_reg;
+                return env->cp15.c0_c1[op2];
+            case 2:
+                if (!arm_feature(env, ARM_FEATURE_V6))
+                    goto bad_reg;
+                return env->cp15.c0_c2[op2];
+            case 3: case 4: case 5: case 6: case 7:
+                return 0;
+            default:
+                goto bad_reg;
+            }
+        case 1:
+            /* These registers aren't documented on arm11 cores.  However
+               Linux looks at them anyway.  */
+            if (!arm_feature(env, ARM_FEATURE_V6))
+                goto bad_reg;
+            if (crm != 0)
+                goto bad_reg;
+            if (!arm_feature(env, ARM_FEATURE_V7))
+                return 0;
+
+            switch (op2) {
+            case 0:
+                return env->cp15.c0_ccsid[env->cp15.c0_cssel];
+            case 1:
+                return env->cp15.c0_clid;
+            case 7:
+                return 0;
+            }
+            goto bad_reg;
+        case 2:
+            if (op2 != 0 || crm != 0)
+                goto bad_reg;
+            return env->cp15.c0_cssel;
+        default:
+            goto bad_reg;
+        }
+    case 1: /* System configuration.  */
+        if (arm_feature(env, ARM_FEATURE_OMAPCP))
+            op2 = 0;
+        switch (op2) {
+        case 0: /* Control register.  */
+            return env->cp15.c1_sys;
+        case 1: /* Auxiliary control register.  */
+            if (arm_feature(env, ARM_FEATURE_XSCALE))
+                return env->cp15.c1_xscaleauxcr;
+            if (!arm_feature(env, ARM_FEATURE_AUXCR))
+                goto bad_reg;
+            switch (ARM_CPUID(env)) {
+            case ARM_CPUID_ARM1026:
+                return 1;
+            case ARM_CPUID_ARM1136:
+            case ARM_CPUID_ARM1136_R2:
+                return 7;
+            case ARM_CPUID_ARM11MPCORE:
+                return 1;
+            case ARM_CPUID_CORTEXA8:
+                return 2;
+            default:
+                goto bad_reg;
+            }
+        case 2: /* Coprocessor access register.  */
+            if (arm_feature(env, ARM_FEATURE_XSCALE))
+                goto bad_reg;
+            return env->cp15.c1_coproc;
+        default:
+            goto bad_reg;
+        }
+    case 2: /* MMU Page table control / MPU cache control.  */
+        if (arm_feature(env, ARM_FEATURE_MPU)) {
+            switch (op2) {
+            case 0:
+                return env->cp15.c2_data;
+                break;
+            case 1:
+                return env->cp15.c2_insn;
+                break;
+            default:
+                goto bad_reg;
+            }
+        } else {
+	    switch (op2) {
+	    case 0:
+		return env->cp15.c2_base0;
+	    case 1:
+		return env->cp15.c2_base1;
+	    case 2:
+                return env->cp15.c2_control;
+	    default:
+		goto bad_reg;
+	    }
+	}
+    case 3: /* MMU Domain access control / MPU write buffer control.  */
+        return env->cp15.c3;
+    case 4: /* Reserved.  */
+        goto bad_reg;
+    case 5: /* MMU Fault status / MPU access permission.  */
+        if (arm_feature(env, ARM_FEATURE_OMAPCP))
+            op2 = 0;
+        switch (op2) {
+        case 0:
+            if (arm_feature(env, ARM_FEATURE_MPU))
+                return simple_mpu_ap_bits(env->cp15.c5_data);
+            return env->cp15.c5_data;
+        case 1:
+            if (arm_feature(env, ARM_FEATURE_MPU))
+                return simple_mpu_ap_bits(env->cp15.c5_data);
+            return env->cp15.c5_insn;
+        case 2:
+            if (!arm_feature(env, ARM_FEATURE_MPU))
+                goto bad_reg;
+            return env->cp15.c5_data;
+        case 3:
+            if (!arm_feature(env, ARM_FEATURE_MPU))
+                goto bad_reg;
+            return env->cp15.c5_insn;
+        default:
+            goto bad_reg;
+        }
+    case 6: /* MMU Fault address.  */
+        if (arm_feature(env, ARM_FEATURE_MPU)) {
+            if (crm >= 8)
+                goto bad_reg;
+            return env->cp15.c6_region[crm];
+        } else {
+            if (arm_feature(env, ARM_FEATURE_OMAPCP))
+                op2 = 0;
+	    switch (op2) {
+	    case 0:
+		return env->cp15.c6_data;
+	    case 1:
+		if (arm_feature(env, ARM_FEATURE_V6)) {
+		    /* Watchpoint Fault Adrress.  */
+		    return 0; /* Not implemented.  */
+		} else {
+		    /* Instruction Fault Adrress.  */
+		    /* Arm9 doesn't have an IFAR, but implementing it anyway
+		       shouldn't do any harm.  */
+		    return env->cp15.c6_insn;
+		}
+	    case 2:
+		if (arm_feature(env, ARM_FEATURE_V6)) {
+		    /* Instruction Fault Adrress.  */
+		    return env->cp15.c6_insn;
+		} else {
+		    goto bad_reg;
+		}
+	    default:
+		goto bad_reg;
+	    }
+        }
+    case 7: /* Cache control.  */
+        /* FIXME: Should only clear Z flag if destination is r15.  */
+        env->ZF = 0;
+        return 0;
+    case 8: /* MMU TLB control.  */
+        goto bad_reg;
+    case 9: /* Cache lockdown.  */
+        switch (op1) {
+        case 0: /* L1 cache.  */
+	    if (arm_feature(env, ARM_FEATURE_OMAPCP))
+		return 0;
+            switch (op2) {
+            case 0:
+                return env->cp15.c9_data;
+            case 1:
+                return env->cp15.c9_insn;
+            default:
+                goto bad_reg;
+            }
+        case 1: /* L2 cache */
+            if (crm != 0)
+                goto bad_reg;
+            /* L2 Lockdown and Auxiliary control.  */
+            return 0;
+        default:
+            goto bad_reg;
+        }
+    case 10: /* MMU TLB lockdown.  */
+        /* ??? TLB lockdown not implemented.  */
+        return 0;
+    case 11: /* TCM DMA control.  */
+    case 12: /* Reserved.  */
+        goto bad_reg;
+    case 13: /* Process ID.  */
+        switch (op2) {
+        case 0:
+            return env->cp15.c13_fcse;
+        case 1:
+            return env->cp15.c13_context;
+        case 2:
+            return env->cp15.c13_tls1;
+        case 3:
+            return env->cp15.c13_tls2;
+        case 4:
+            return env->cp15.c13_tls3;
+        default:
+            goto bad_reg;
+        }
+    case 14: /* Reserved.  */
+        goto bad_reg;
+    case 15: /* Implementation specific.  */
+        if (arm_feature(env, ARM_FEATURE_XSCALE)) {
+            if (op2 == 0 && crm == 1)
+                return env->cp15.c15_cpar;
+
+            goto bad_reg;
+        }
+        if (arm_feature(env, ARM_FEATURE_OMAPCP)) {
+            switch (crm) {
+            case 0:
+                return 0;
+            case 1: /* Read TI925T configuration.  */
+                return env->cp15.c15_ticonfig;
+            case 2: /* Read I_max.  */
+                return env->cp15.c15_i_max;
+            case 3: /* Read I_min.  */
+                return env->cp15.c15_i_min;
+            case 4: /* Read thread-ID.  */
+                return env->cp15.c15_threadid;
+            case 8: /* TI925T_status */
+                return 0;
+            }
+            /* TODO: Peripheral port remap register:
+             * On OMAP2 mcr p15, 0, rn, c15, c2, 4 sets up the interrupt
+             * controller base address at $rn & ~0xfff and map size of
+             * 0x200 << ($rn & 0xfff), when MMU is off.  */
+            goto bad_reg;
+        }
+        return 0;
+    }
+bad_reg:
+    /* ??? For debugging only.  Should raise illegal instruction exception.  */
+    cpu_abort(env, "Unimplemented cp15 register read (c%d, c%d, {%d, %d})\n",
+              (insn >> 16) & 0xf, crm, op1, op2);
+    return 0;
+}
+
+void HELPER(set_r13_banked)(CPUState *env, uint32_t mode, uint32_t val)
+{
+    env->banked_r13[bank_number(mode)] = val;
+}
+
+uint32_t HELPER(get_r13_banked)(CPUState *env, uint32_t mode)
+{
+    return env->banked_r13[bank_number(mode)];
+}
+
+uint32_t HELPER(v7m_mrs)(CPUState *env, uint32_t reg)
+{
+    switch (reg) {
+    case 0: /* APSR */
+        return xpsr_read(env) & 0xf8000000;
+    case 1: /* IAPSR */
+        return xpsr_read(env) & 0xf80001ff;
+    case 2: /* EAPSR */
+        return xpsr_read(env) & 0xff00fc00;
+    case 3: /* xPSR */
+        return xpsr_read(env) & 0xff00fdff;
+    case 5: /* IPSR */
+        return xpsr_read(env) & 0x000001ff;
+    case 6: /* EPSR */
+        return xpsr_read(env) & 0x0700fc00;
+    case 7: /* IEPSR */
+        return xpsr_read(env) & 0x0700edff;
+    case 8: /* MSP */
+        return env->v7m.current_sp ? env->v7m.other_sp : env->regs[13];
+    case 9: /* PSP */
+        return env->v7m.current_sp ? env->regs[13] : env->v7m.other_sp;
+    case 16: /* PRIMASK */
+        return (env->uncached_cpsr & CPSR_I) != 0;
+    case 17: /* FAULTMASK */
+        return (env->uncached_cpsr & CPSR_F) != 0;
+    case 18: /* BASEPRI */
+    case 19: /* BASEPRI_MAX */
+        return env->v7m.basepri;
+    case 20: /* CONTROL */
+        return env->v7m.control;
+    default:
+        /* ??? For debugging only.  */
+        cpu_abort(env, "Unimplemented system register read (%d)\n", reg);
+        return 0;
+    }
+}
+
+void HELPER(v7m_msr)(CPUState *env, uint32_t reg, uint32_t val)
+{
+    switch (reg) {
+    case 0: /* APSR */
+        xpsr_write(env, val, 0xf8000000);
+        break;
+    case 1: /* IAPSR */
+        xpsr_write(env, val, 0xf8000000);
+        break;
+    case 2: /* EAPSR */
+        xpsr_write(env, val, 0xfe00fc00);
+        break;
+    case 3: /* xPSR */
+        xpsr_write(env, val, 0xfe00fc00);
+        break;
+    case 5: /* IPSR */
+        /* IPSR bits are readonly.  */
+        break;
+    case 6: /* EPSR */
+        xpsr_write(env, val, 0x0600fc00);
+        break;
+    case 7: /* IEPSR */
+        xpsr_write(env, val, 0x0600fc00);
+        break;
+    case 8: /* MSP */
+        if (env->v7m.current_sp)
+            env->v7m.other_sp = val;
+        else
+            env->regs[13] = val;
+        break;
+    case 9: /* PSP */
+        if (env->v7m.current_sp)
+            env->regs[13] = val;
+        else
+            env->v7m.other_sp = val;
+        break;
+    case 16: /* PRIMASK */
+        if (val & 1)
+            env->uncached_cpsr |= CPSR_I;
+        else
+            env->uncached_cpsr &= ~CPSR_I;
+        break;
+    case 17: /* FAULTMASK */
+        if (val & 1)
+            env->uncached_cpsr |= CPSR_F;
+        else
+            env->uncached_cpsr &= ~CPSR_F;
+        break;
+    case 18: /* BASEPRI */
+        env->v7m.basepri = val & 0xff;
+        break;
+    case 19: /* BASEPRI_MAX */
+        val &= 0xff;
+        if (val != 0 && (val < env->v7m.basepri || env->v7m.basepri == 0))
+            env->v7m.basepri = val;
+        break;
+    case 20: /* CONTROL */
+        env->v7m.control = val & 3;
+        switch_v7m_sp(env, (val & 2) != 0);
+        break;
+    default:
+        /* ??? For debugging only.  */
+        cpu_abort(env, "Unimplemented system register write (%d)\n", reg);
+        return;
+    }
+}
+
+void cpu_arm_set_cp_io(CPUARMState *env, int cpnum,
+                ARMReadCPFunc *cp_read, ARMWriteCPFunc *cp_write,
+                void *opaque)
+{
+    if (cpnum < 0 || cpnum > 14) {
+        cpu_abort(env, "Bad coprocessor number: %i\n", cpnum);
+        return;
+    }
+
+    env->cp[cpnum].cp_read = cp_read;
+    env->cp[cpnum].cp_write = cp_write;
+    env->cp[cpnum].opaque = opaque;
+}
+
 #endif
 
-#include "tcg/helper-mve.h"
+/* Note that signed overflow is undefined in C.  The following routines are
+   careful to use unsigned types where modulo arithmetic is required.
+   Failure to do so _will_ break on newer gcc.  */
+
+/* Signed saturating arithmetic.  */
+
+/* Perform 16-bit signed saturating addition.  */
+static inline uint16_t add16_sat(uint16_t a, uint16_t b)
+{
+    uint16_t res;
+
+    res = a + b;
+    if (((res ^ a) & 0x8000) && !((a ^ b) & 0x8000)) {
+        if (a & 0x8000)
+            res = 0x8000;
+        else
+            res = 0x7fff;
+    }
+    return res;
+}
+
+/* Perform 8-bit signed saturating addition.  */
+static inline uint8_t add8_sat(uint8_t a, uint8_t b)
+{
+    uint8_t res;
+
+    res = a + b;
+    if (((res ^ a) & 0x80) && !((a ^ b) & 0x80)) {
+        if (a & 0x80)
+            res = 0x80;
+        else
+            res = 0x7f;
+    }
+    return res;
+}
+
+/* Perform 16-bit signed saturating subtraction.  */
+static inline uint16_t sub16_sat(uint16_t a, uint16_t b)
+{
+    uint16_t res;
+
+    res = a - b;
+    if (((res ^ a) & 0x8000) && ((a ^ b) & 0x8000)) {
+        if (a & 0x8000)
+            res = 0x8000;
+        else
+            res = 0x7fff;
+    }
+    return res;
+}
+
+/* Perform 8-bit signed saturating subtraction.  */
+static inline uint8_t sub8_sat(uint8_t a, uint8_t b)
+{
+    uint8_t res;
+
+    res = a - b;
+    if (((res ^ a) & 0x80) && ((a ^ b) & 0x80)) {
+        if (a & 0x80)
+            res = 0x80;
+        else
+            res = 0x7f;
+    }
+    return res;
+}
+
+#define ADD16(a, b, n) RESULT(add16_sat(a, b), n, 16);
+#define SUB16(a, b, n) RESULT(sub16_sat(a, b), n, 16);
+#define ADD8(a, b, n)  RESULT(add8_sat(a, b), n, 8);
+#define SUB8(a, b, n)  RESULT(sub8_sat(a, b), n, 8);
+#define PFX q
+
+#include "op_addsub.h"
+
+/* Unsigned saturating arithmetic.  */
+static inline uint16_t add16_usat(uint16_t a, uint16_t b)
+{
+    uint16_t res;
+    res = a + b;
+    if (res < a)
+        res = 0xffff;
+    return res;
+}
+
+static inline uint16_t sub16_usat(uint16_t a, uint16_t b)
+{
+    if (a < b)
+        return a - b;
+    else
+        return 0;
+}
+
+static inline uint8_t add8_usat(uint8_t a, uint8_t b)
+{
+    uint8_t res;
+    res = a + b;
+    if (res < a)
+        res = 0xff;
+    return res;
+}
+
+static inline uint8_t sub8_usat(uint8_t a, uint8_t b)
+{
+    if (a < b)
+        return a - b;
+    else
+        return 0;
+}
+
+#define ADD16(a, b, n) RESULT(add16_usat(a, b), n, 16);
+#define SUB16(a, b, n) RESULT(sub16_usat(a, b), n, 16);
+#define ADD8(a, b, n)  RESULT(add8_usat(a, b), n, 8);
+#define SUB8(a, b, n)  RESULT(sub8_usat(a, b), n, 8);
+#define PFX uq
+
+#include "op_addsub.h"
+
+/* Signed modulo arithmetic.  */
+#define SARITH16(a, b, n, op) do { \
+    int32_t sum; \
+    sum = (int16_t)((uint16_t)(a) op (uint16_t)(b)); \
+    RESULT(sum, n, 16); \
+    if (sum >= 0) \
+        ge |= 3 << (n * 2); \
+    } while(0)
+
+#define SARITH8(a, b, n, op) do { \
+    int32_t sum; \
+    sum = (int8_t)((uint8_t)(a) op (uint8_t)(b)); \
+    RESULT(sum, n, 8); \
+    if (sum >= 0) \
+        ge |= 1 << n; \
+    } while(0)
+
+
+#define ADD16(a, b, n) SARITH16(a, b, n, +)
+#define SUB16(a, b, n) SARITH16(a, b, n, -)
+#define ADD8(a, b, n)  SARITH8(a, b, n, +)
+#define SUB8(a, b, n)  SARITH8(a, b, n, -)
+#define PFX s
+#define ARITH_GE
+
+#include "op_addsub.h"
+
+/* Unsigned modulo arithmetic.  */
+#define ADD16(a, b, n) do { \
+    uint32_t sum; \
+    sum = (uint32_t)(uint16_t)(a) + (uint32_t)(uint16_t)(b); \
+    RESULT(sum, n, 16); \
+    if ((sum >> 16) == 1) \
+        ge |= 3 << (n * 2); \
+    } while(0)
+
+#define ADD8(a, b, n) do { \
+    uint32_t sum; \
+    sum = (uint32_t)(uint8_t)(a) + (uint32_t)(uint8_t)(b); \
+    RESULT(sum, n, 8); \
+    if ((sum >> 8) == 1) \
+        ge |= 1 << n; \
+    } while(0)
+
+#define SUB16(a, b, n) do { \
+    uint32_t sum; \
+    sum = (uint32_t)(uint16_t)(a) - (uint32_t)(uint16_t)(b); \
+    RESULT(sum, n, 16); \
+    if ((sum >> 16) == 0) \
+        ge |= 3 << (n * 2); \
+    } while(0)
+
+#define SUB8(a, b, n) do { \
+    uint32_t sum; \
+    sum = (uint32_t)(uint8_t)(a) - (uint32_t)(uint8_t)(b); \
+    RESULT(sum, n, 8); \
+    if ((sum >> 8) == 0) \
+        ge |= 1 << n; \
+    } while(0)
+
+#define PFX u
+#define ARITH_GE
+
+#include "op_addsub.h"
+
+/* Halved signed arithmetic.  */
+#define ADD16(a, b, n) \
+  RESULT(((int32_t)(int16_t)(a) + (int32_t)(int16_t)(b)) >> 1, n, 16)
+#define SUB16(a, b, n) \
+  RESULT(((int32_t)(int16_t)(a) - (int32_t)(int16_t)(b)) >> 1, n, 16)
+#define ADD8(a, b, n) \
+  RESULT(((int32_t)(int8_t)(a) + (int32_t)(int8_t)(b)) >> 1, n, 8)
+#define SUB8(a, b, n) \
+  RESULT(((int32_t)(int8_t)(a) - (int32_t)(int8_t)(b)) >> 1, n, 8)
+#define PFX sh
+
+#include "op_addsub.h"
+
+/* Halved unsigned arithmetic.  */
+#define ADD16(a, b, n) \
+  RESULT(((uint32_t)(uint16_t)(a) + (uint32_t)(uint16_t)(b)) >> 1, n, 16)
+#define SUB16(a, b, n) \
+  RESULT(((uint32_t)(uint16_t)(a) - (uint32_t)(uint16_t)(b)) >> 1, n, 16)
+#define ADD8(a, b, n) \
+  RESULT(((uint32_t)(uint8_t)(a) + (uint32_t)(uint8_t)(b)) >> 1, n, 8)
+#define SUB8(a, b, n) \
+  RESULT(((uint32_t)(uint8_t)(a) - (uint32_t)(uint8_t)(b)) >> 1, n, 8)
+#define PFX uh
+
+#include "op_addsub.h"
+
+static inline uint8_t do_usad(uint8_t a, uint8_t b)
+{
+    if (a > b)
+        return a - b;
+    else
+        return b - a;
+}
+
+/* Unsigned sum of absolute byte differences.  */
+uint32_t HELPER(usad8)(uint32_t a, uint32_t b)
+{
+    uint32_t sum;
+    sum = do_usad(a, b);
+    sum += do_usad(a >> 8, b >> 8);
+    sum += do_usad(a >> 16, b >>16);
+    sum += do_usad(a >> 24, b >> 24);
+    return sum;
+}
+
+/* For ARMv6 SEL instruction.  */
+uint32_t HELPER(sel_flags)(uint32_t flags, uint32_t a, uint32_t b)
+{
+    uint32_t mask;
+
+    mask = 0;
+    if (flags & 1)
+        mask |= 0xff;
+    if (flags & 2)
+        mask |= 0xff00;
+    if (flags & 4)
+        mask |= 0xff0000;
+    if (flags & 8)
+        mask |= 0xff000000;
+    return (a & mask) | (b & ~mask);
+}
+
+uint32_t HELPER(logicq_cc)(uint64_t val)
+{
+    return (val >> 32) | (val != 0);
+}
+
+/* VFP support.  We follow the convention used for VFP instrunctions:
+   Single precition routines have a "s" suffix, double precision a
+   "d" suffix.  */
+
+/* Convert host exception flags to vfp form.  */
+static inline int vfp_exceptbits_from_host(int host_bits)
+{
+    int target_bits = 0;
+
+    if (host_bits & float_flag_invalid)
+        target_bits |= 1;
+    if (host_bits & float_flag_divbyzero)
+        target_bits |= 2;
+    if (host_bits & float_flag_overflow)
+        target_bits |= 4;
+    if (host_bits & float_flag_underflow)
+        target_bits |= 8;
+    if (host_bits & float_flag_inexact)
+        target_bits |= 0x10;
+    return target_bits;
+}
+
+uint32_t HELPER(vfp_get_fpscr)(CPUState *env)
+{
+    int i;
+    uint32_t fpscr;
+
+    fpscr = (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
+            | (env->vfp.vec_len << 16)
+            | (env->vfp.vec_stride << 20);
+    i = get_float_exception_flags(&env->vfp.fp_status);
+    fpscr |= vfp_exceptbits_from_host(i);
+    return fpscr;
+}
+
+/* Convert vfp exception flags to target form.  */
+static inline int vfp_exceptbits_to_host(int target_bits)
+{
+    int host_bits = 0;
+
+    if (target_bits & 1)
+        host_bits |= float_flag_invalid;
+    if (target_bits & 2)
+        host_bits |= float_flag_divbyzero;
+    if (target_bits & 4)
+        host_bits |= float_flag_overflow;
+    if (target_bits & 8)
+        host_bits |= float_flag_underflow;
+    if (target_bits & 0x10)
+        host_bits |= float_flag_inexact;
+    return host_bits;
+}
+
+void HELPER(vfp_set_fpscr)(CPUState *env, uint32_t val)
+{
+    int i;
+    uint32_t changed;
+
+    changed = env->vfp.xregs[ARM_VFP_FPSCR];
+    env->vfp.xregs[ARM_VFP_FPSCR] = (val & 0xffc8ffff);
+    env->vfp.vec_len = (val >> 16) & 7;
+    env->vfp.vec_stride = (val >> 20) & 3;
+
+    changed ^= val;
+    if (changed & (3 << 22)) {
+        i = (val >> 22) & 3;
+        switch (i) {
+        case 0:
+            i = float_round_nearest_even;
+            break;
+        case 1:
+            i = float_round_up;
+            break;
+        case 2:
+            i = float_round_down;
+            break;
+        case 3:
+            i = float_round_to_zero;
+            break;
+        }
+        set_float_rounding_mode(i, &env->vfp.fp_status);
+    }
+    if (changed & (1 << 24))
+        set_flush_to_zero((val & (1 << 24)) != 0, &env->vfp.fp_status);
+    if (changed & (1 << 25))
+        set_default_nan_mode((val & (1 << 25)) != 0, &env->vfp.fp_status);
+
+    i = vfp_exceptbits_to_host((val >> 8) & 0x1f);
+    set_float_exception_flags(i, &env->vfp.fp_status);
+}
+
+#define VFP_HELPER(name, p) HELPER(glue(glue(vfp_,name),p))
+
+#define VFP_BINOP(name) \
+float32 VFP_HELPER(name, s)(float32 a, float32 b, CPUState *env) \
+{ \
+    return float32_ ## name (a, b, &env->vfp.fp_status); \
+} \
+float64 VFP_HELPER(name, d)(float64 a, float64 b, CPUState *env) \
+{ \
+    return float64_ ## name (a, b, &env->vfp.fp_status); \
+}
+VFP_BINOP(add)
+VFP_BINOP(sub)
+VFP_BINOP(mul)
+VFP_BINOP(div)
+#undef VFP_BINOP
+
+float32 VFP_HELPER(neg, s)(float32 a)
+{
+    return float32_chs(a);
+}
+
+float64 VFP_HELPER(neg, d)(float64 a)
+{
+    return float64_chs(a);
+}
+
+float32 VFP_HELPER(abs, s)(float32 a)
+{
+    return float32_abs(a);
+}
+
+float64 VFP_HELPER(abs, d)(float64 a)
+{
+    return float64_abs(a);
+}
+
+float32 VFP_HELPER(sqrt, s)(float32 a, CPUState *env)
+{
+    return float32_sqrt(a, &env->vfp.fp_status);
+}
+
+float64 VFP_HELPER(sqrt, d)(float64 a, CPUState *env)
+{
+    return float64_sqrt(a, &env->vfp.fp_status);
+}
+
+/* XXX: check quiet/signaling case */
+#define DO_VFP_cmp(p, type) \
+void VFP_HELPER(cmp, p)(type a, type b, CPUState *env)  \
+{ \
+    uint32_t flags; \
+    switch(type ## _compare_quiet(a, b, &env->vfp.fp_status)) { \
+    case 0: flags = 0x6; break; \
+    case -1: flags = 0x8; break; \
+    case 1: flags = 0x2; break; \
+    default: case 2: flags = 0x3; break; \
+    } \
+    env->vfp.xregs[ARM_VFP_FPSCR] = (flags << 28) \
+        | (env->vfp.xregs[ARM_VFP_FPSCR] & 0x0fffffff); \
+} \
+void VFP_HELPER(cmpe, p)(type a, type b, CPUState *env) \
+{ \
+    uint32_t flags; \
+    switch(type ## _compare(a, b, &env->vfp.fp_status)) { \
+    case 0: flags = 0x6; break; \
+    case -1: flags = 0x8; break; \
+    case 1: flags = 0x2; break; \
+    default: case 2: flags = 0x3; break; \
+    } \
+    env->vfp.xregs[ARM_VFP_FPSCR] = (flags << 28) \
+        | (env->vfp.xregs[ARM_VFP_FPSCR] & 0x0fffffff); \
+}
+DO_VFP_cmp(s, float32)
+DO_VFP_cmp(d, float64)
+#undef DO_VFP_cmp
+
+/* Helper routines to perform bitwise copies between float and int.  */
+static inline float32 vfp_itos(uint32_t i)
+{
+    union {
+        uint32_t i;
+        float32 s;
+    } v;
+
+    v.i = i;
+    return v.s;
+}
+
+static inline uint32_t vfp_stoi(float32 s)
+{
+    union {
+        uint32_t i;
+        float32 s;
+    } v;
+
+    v.s = s;
+    return v.i;
+}
+
+static inline float64 vfp_itod(uint64_t i)
+{
+    union {
+        uint64_t i;
+        float64 d;
+    } v;
+
+    v.i = i;
+    return v.d;
+}
+
+static inline uint64_t vfp_dtoi(float64 d)
+{
+    union {
+        uint64_t i;
+        float64 d;
+    } v;
+
+    v.d = d;
+    return v.i;
+}
+
+/* Integer to float conversion.  */
+float32 VFP_HELPER(uito, s)(float32 x, CPUState *env)
+{
+    return uint32_to_float32(vfp_stoi(x), &env->vfp.fp_status);
+}
+
+float64 VFP_HELPER(uito, d)(float32 x, CPUState *env)
+{
+    return uint32_to_float64(vfp_stoi(x), &env->vfp.fp_status);
+}
+
+float32 VFP_HELPER(sito, s)(float32 x, CPUState *env)
+{
+    return int32_to_float32(vfp_stoi(x), &env->vfp.fp_status);
+}
+
+float64 VFP_HELPER(sito, d)(float32 x, CPUState *env)
+{
+    return int32_to_float64(vfp_stoi(x), &env->vfp.fp_status);
+}
+
+/* Float to integer conversion.  */
+float32 VFP_HELPER(toui, s)(float32 x, CPUState *env)
+{
+    return vfp_itos(float32_to_uint32(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(toui, d)(float64 x, CPUState *env)
+{
+    return vfp_itos(float64_to_uint32(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(tosi, s)(float32 x, CPUState *env)
+{
+    return vfp_itos(float32_to_int32(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(tosi, d)(float64 x, CPUState *env)
+{
+    return vfp_itos(float64_to_int32(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(touiz, s)(float32 x, CPUState *env)
+{
+    return vfp_itos(float32_to_uint32_round_to_zero(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(touiz, d)(float64 x, CPUState *env)
+{
+    return vfp_itos(float64_to_uint32_round_to_zero(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(tosiz, s)(float32 x, CPUState *env)
+{
+    return vfp_itos(float32_to_int32_round_to_zero(x, &env->vfp.fp_status));
+}
+
+float32 VFP_HELPER(tosiz, d)(float64 x, CPUState *env)
+{
+    return vfp_itos(float64_to_int32_round_to_zero(x, &env->vfp.fp_status));
+}
+
+/* floating point conversion */
+float64 VFP_HELPER(fcvtd, s)(float32 x, CPUState *env)
+{
+    return float32_to_float64(x, &env->vfp.fp_status);
+}
+
+float32 VFP_HELPER(fcvts, d)(float64 x, CPUState *env)
+{
+    return float64_to_float32(x, &env->vfp.fp_status);
+}
+
+/* VFP3 fixed point conversion.  */
+#define VFP_CONV_FIX(name, p, ftype, itype, sign) \
+ftype VFP_HELPER(name##to, p)(ftype x, uint32_t shift, CPUState *env) \
+{ \
+    ftype tmp; \
+    tmp = sign##int32_to_##ftype ((itype)vfp_##p##toi(x), \
+                                  &env->vfp.fp_status); \
+    return ftype##_scalbn(tmp, -(int)shift, &env->vfp.fp_status); \
+} \
+ftype VFP_HELPER(to##name, p)(ftype x, uint32_t shift, CPUState *env) \
+{ \
+    ftype tmp; \
+    tmp = ftype##_scalbn(x, shift, &env->vfp.fp_status); \
+    return vfp_ito##p((itype)ftype##_to_##sign##int32_round_to_zero(tmp, \
+        &env->vfp.fp_status)); \
+}
+
+VFP_CONV_FIX(sh, d, float64, int16, )
+VFP_CONV_FIX(sl, d, float64, int32, )
+VFP_CONV_FIX(uh, d, float64, uint16, u)
+VFP_CONV_FIX(ul, d, float64, uint32, u)
+VFP_CONV_FIX(sh, s, float32, int16, )
+VFP_CONV_FIX(sl, s, float32, int32, )
+VFP_CONV_FIX(uh, s, float32, uint16, u)
+VFP_CONV_FIX(ul, s, float32, uint32, u)
+#undef VFP_CONV_FIX
+
+float32 HELPER(recps_f32)(float32 a, float32 b, CPUState *env)
+{
+    float_status *s = &env->vfp.fp_status;
+    float32 two = int32_to_float32(2, s);
+    return float32_sub(two, float32_mul(a, b, s), s);
+}
+
+float32 HELPER(rsqrts_f32)(float32 a, float32 b, CPUState *env)
+{
+    float_status *s = &env->vfp.fp_status;
+    float32 three = int32_to_float32(3, s);
+    return float32_sub(three, float32_mul(a, b, s), s);
+}
+
+/* NEON helpers.  */
+
+/* TODO: The architecture specifies the value that the estimate functions
+   should return.  We return the exact reciprocal/root instead.  */
+float32 HELPER(recpe_f32)(float32 a, CPUState *env)
+{
+    float_status *s = &env->vfp.fp_status;
+    float32 one = int32_to_float32(1, s);
+    return float32_div(one, a, s);
+}
+
+float32 HELPER(rsqrte_f32)(float32 a, CPUState *env)
+{
+    float_status *s = &env->vfp.fp_status;
+    float32 one = int32_to_float32(1, s);
+    return float32_div(one, float32_sqrt(a, s), s);
+}
+
+uint32_t HELPER(recpe_u32)(uint32_t a, CPUState *env)
+{
+    float_status *s = &env->vfp.fp_status;
+    float32 tmp;
+    tmp = int32_to_float32(a, s);
+    tmp = float32_scalbn(tmp, -32, s);
+    tmp = helper_recpe_f32(tmp, env);
+    tmp = float32_scalbn(tmp, 31, s);
+    return float32_to_int32(tmp, s);
+}
+
+uint32_t HELPER(rsqrte_u32)(uint32_t a, CPUState *env)
+{
+    float_status *s = &env->vfp.fp_status;
+    float32 tmp;
+    tmp = int32_to_float32(a, s);
+    tmp = float32_scalbn(tmp, -32, s);
+    tmp = helper_rsqrte_f32(tmp, env);
+    tmp = float32_scalbn(tmp, 31, s);
+    return float32_to_int32(tmp, s);
+}
+
+void HELPER(set_teecr)(CPUState *env, uint32_t val)
+{
+    val &= 1;
+    if (env->teecr != val) {
+        env->teecr = val;
+        tb_flush(env);
+    }
+}
