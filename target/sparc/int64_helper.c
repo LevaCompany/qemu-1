@@ -6,7 +6,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,7 +18,6 @@
  */
 
 #include "qemu/osdep.h"
-#include "qemu/main-loop.h"
 #include "cpu.h"
 #include "exec/helper-proto.h"
 #include "exec/log.h"
@@ -62,72 +61,6 @@ static const char * const excp_names[0x80] = {
 };
 #endif
 
-void cpu_check_irqs(CPUSPARCState *env)
-{
-    CPUState *cs;
-    uint32_t pil = env->pil_in |
-                  (env->softint & ~(SOFTINT_TIMER | SOFTINT_STIMER));
-
-    /* We should be holding the BQL before we mess with IRQs */
-    g_assert(qemu_mutex_iothread_locked());
-
-    /* TT_IVEC has a higher priority (16) than TT_EXTINT (31..17) */
-    if (env->ivec_status & 0x20) {
-        return;
-    }
-    cs = env_cpu(env);
-    /*
-     * check if TM or SM in SOFTINT are set
-     * setting these also causes interrupt 14
-     */
-    if (env->softint & (SOFTINT_TIMER | SOFTINT_STIMER)) {
-        pil |= 1 << 14;
-    }
-
-    /*
-     * The bit corresponding to psrpil is (1<< psrpil),
-     * the next bit is (2 << psrpil).
-     */
-    if (pil < (2 << env->psrpil)) {
-        if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-            trace_sparc64_cpu_check_irqs_reset_irq(env->interrupt_index);
-            env->interrupt_index = 0;
-            cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-        }
-        return;
-    }
-
-    if (cpu_interrupts_enabled(env)) {
-
-        unsigned int i;
-
-        for (i = 15; i > env->psrpil; i--) {
-            if (pil & (1 << i)) {
-                int old_interrupt = env->interrupt_index;
-                int new_interrupt = TT_EXTINT | i;
-
-                if (unlikely(env->tl > 0 && cpu_tsptr(env)->tt > new_interrupt
-                  && ((cpu_tsptr(env)->tt & 0x1f0) == TT_EXTINT))) {
-                    trace_sparc64_cpu_check_irqs_noset_irq(env->tl,
-                                                      cpu_tsptr(env)->tt,
-                                                      new_interrupt);
-                } else if (old_interrupt != new_interrupt) {
-                    env->interrupt_index = new_interrupt;
-                    trace_sparc64_cpu_check_irqs_set_irq(i, old_interrupt,
-                                                         new_interrupt);
-                    cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-                }
-                break;
-            }
-        }
-    } else if (cs->interrupt_request & CPU_INTERRUPT_HARD) {
-        trace_sparc64_cpu_check_irqs_disabled(pil, env->pil_in, env->softint,
-                                              env->interrupt_index);
-        env->interrupt_index = 0;
-        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-    }
-}
-
 void sparc_cpu_do_interrupt(CPUState *cs)
 {
     SPARCCPU *cpu = SPARC_CPU(cs);
@@ -145,10 +78,8 @@ void sparc_cpu_do_interrupt(CPUState *cs)
         static int count;
         const char *name;
 
-        if (intno < 0 || intno >= 0x1ff) {
+        if (intno < 0 || intno >= 0x180) {
             name = "Unknown";
-        } else if (intno >= 0x180) {
-            name = "Hyperprivileged Trap Instruction";
         } else if (intno >= 0x100) {
             name = "Trap Instruction";
         } else if (intno >= 0xc0) {
@@ -197,46 +128,23 @@ void sparc_cpu_do_interrupt(CPUState *cs)
     }
     tsptr = cpu_tsptr(env);
 
-    tsptr->tstate = sparc64_tstate(env);
+    tsptr->tstate = (cpu_get_ccr(env) << 32) |
+        ((env->asi & 0xff) << 24) | ((env->pstate & 0xf3f) << 8) |
+        cpu_get_cwp64(env);
     tsptr->tpc = env->pc;
     tsptr->tnpc = env->npc;
     tsptr->tt = intno;
 
-    if (cpu_has_hypervisor(env)) {
-        env->htstate[env->tl] = env->hpstate;
-        /* XXX OpenSPARC T1 - UltraSPARC T3 have MAXPTL=2
-           but this may change in the future */
-        if (env->tl > 2) {
-            env->hpstate |= HS_PRIV;
-        }
-    }
-
-    if (env->def.features & CPU_FEATURE_GL) {
-        cpu_gl_switch_gregs(env, env->gl + 1);
-        env->gl++;
-    }
-
     switch (intno) {
     case TT_IVEC:
-        if (!cpu_has_hypervisor(env)) {
-            cpu_change_pstate(env, PS_PEF | PS_PRIV | PS_IG);
-        }
+        cpu_change_pstate(env, PS_PEF | PS_PRIV | PS_IG);
         break;
     case TT_TFAULT:
     case TT_DFAULT:
     case TT_TMISS ... TT_TMISS + 3:
     case TT_DMISS ... TT_DMISS + 3:
     case TT_DPROT ... TT_DPROT + 3:
-        if (cpu_has_hypervisor(env)) {
-            env->hpstate |= HS_PRIV;
-            env->pstate = PS_PEF | PS_PRIV;
-        } else {
-            cpu_change_pstate(env, PS_PEF | PS_PRIV | PS_MG);
-        }
-        break;
-    case TT_INSN_REAL_TRANSLATION_MISS ... TT_DATA_REAL_TRANSLATION_MISS:
-    case TT_HTRAP ... TT_HTRAP + 127:
-        env->hpstate |= HS_PRIV;
+        cpu_change_pstate(env, PS_PEF | PS_PRIV | PS_MG);
         break;
     default:
         cpu_change_pstate(env, PS_PEF | PS_PRIV | PS_AG);
@@ -250,13 +158,8 @@ void sparc_cpu_do_interrupt(CPUState *cs)
     } else if ((intno & 0x1c0) == TT_FILL) {
         cpu_set_cwp(env, cpu_cwp_inc(env, env->cwp + 1));
     }
-
-    if (cpu_hypervisor_mode(env)) {
-        env->pc = (env->htba & ~0x3fffULL) | (intno << 5);
-    } else {
-        env->pc = env->tbr  & ~0x7fffULL;
-        env->pc |= ((env->tl > 1) ? 1 << 14 : 0) | (intno << 5);
-    }
+    env->pc = env->tbr  & ~0x7fffULL;
+    env->pc |= ((env->tl > 1) ? 1 << 14 : 0) | (intno << 5);
     env->npc = env->pc + 4;
     cs->exception_index = -1;
 }
@@ -272,9 +175,7 @@ static bool do_modify_softint(CPUSPARCState *env, uint32_t value)
         env->softint = value;
 #if !defined(CONFIG_USER_ONLY)
         if (cpu_interrupts_enabled(env)) {
-            qemu_mutex_lock_iothread();
             cpu_check_irqs(env);
-            qemu_mutex_unlock_iothread();
         }
 #endif
         return true;

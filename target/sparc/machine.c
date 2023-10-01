@@ -1,15 +1,22 @@
 #include "qemu/osdep.h"
+#include "qemu-common.h"
 #include "cpu.h"
 #include "exec/exec-all.h"
+#include "hw/hw.h"
+#include "hw/boards.h"
 #include "qemu/timer.h"
 
+#include "cpu.h"
+#include "exec/exec-all.h"
 #include "migration/cpu.h"
+#include "exec/exec-all.h"
 
 #ifdef TARGET_SPARC64
 static const VMStateDescription vmstate_cpu_timer = {
     .name = "cpu_timer",
     .version_id = 1,
     .minimum_version_id = 1,
+    .minimum_version_id_old = 1,
     .fields = (VMStateField[]) {
         VMSTATE_UINT32(frequency, CPUTimer),
         VMSTATE_UINT32(disabled, CPUTimer),
@@ -29,6 +36,7 @@ static const VMStateDescription vmstate_trap_state = {
     .name = "trap_state",
     .version_id = 1,
     .minimum_version_id = 1,
+    .minimum_version_id_old = 1,
     .fields = (VMStateField[]) {
         VMSTATE_UINT64(tpc, trap_state),
         VMSTATE_UINT64(tnpc, trap_state),
@@ -42,6 +50,7 @@ static const VMStateDescription vmstate_tlb_entry = {
     .name = "tlb_entry",
     .version_id = 1,
     .minimum_version_id = 1,
+    .minimum_version_id_old = 1,
     .fields = (VMStateField[]) {
         VMSTATE_UINT64(tag, SparcTLBEntry),
         VMSTATE_UINT64(tte, SparcTLBEntry),
@@ -50,8 +59,7 @@ static const VMStateDescription vmstate_tlb_entry = {
 };
 #endif
 
-static int get_psr(QEMUFile *f, void *opaque, size_t size,
-                   const VMStateField *field)
+static int get_psr(QEMUFile *f, void *opaque, size_t size)
 {
     SPARCCPU *cpu = opaque;
     CPUSPARCState *env = &cpu->env;
@@ -64,8 +72,7 @@ static int get_psr(QEMUFile *f, void *opaque, size_t size,
     return 0;
 }
 
-static int put_psr(QEMUFile *f, void *opaque, size_t size,
-                   const VMStateField *field, JSONWriter *vmdesc)
+static void put_psr(QEMUFile *f, void *opaque, size_t size)
 {
     SPARCCPU *cpu = opaque;
     CPUSPARCState *env = &cpu->env;
@@ -74,7 +81,6 @@ static int put_psr(QEMUFile *f, void *opaque, size_t size,
     val = cpu_get_psr(env);
 
     qemu_put_be32(f, val);
-    return 0;
 }
 
 static const VMStateInfo vmstate_psr = {
@@ -83,7 +89,7 @@ static const VMStateInfo vmstate_psr = {
     .put = put_psr,
 };
 
-static int cpu_pre_save(void *opaque)
+static void cpu_pre_save(void *opaque)
 {
     SPARCCPU *cpu = opaque;
     CPUSPARCState *env = &cpu->env;
@@ -92,8 +98,6 @@ static int cpu_pre_save(void *opaque)
      * window as the outs of the first window
      */
     cpu_set_cwp(env, env->cwp);
-
-    return 0;
 }
 
 /* 32-bit SPARC retains migration compatibility with older versions
@@ -110,6 +114,7 @@ const VMStateDescription vmstate_sparc_cpu = {
     .name = "cpu",
     .version_id = SPARC_VMSTATE_VER,
     .minimum_version_id = SPARC_VMSTATE_VER,
+    .minimum_version_id_old = SPARC_VMSTATE_VER,
     .pre_save = cpu_pre_save,
     .fields = (VMStateField[]) {
         VMSTATE_UINTTL_ARRAY(env.gregs, SPARCCPU, 8),
@@ -146,8 +151,8 @@ const VMStateDescription vmstate_sparc_cpu = {
         VMSTATE_UINT64_ARRAY(env.mmubpregs, SPARCCPU, 4),
 #else
         VMSTATE_UINT64(env.lsu, SPARCCPU),
-        VMSTATE_UINT64_ARRAY(env.immu.mmuregs, SPARCCPU, 16),
-        VMSTATE_UINT64_ARRAY(env.dmmu.mmuregs, SPARCCPU, 16),
+        VMSTATE_UINT64_ARRAY(env.immuregs, SPARCCPU, 16),
+        VMSTATE_UINT64_ARRAY(env.dmmuregs, SPARCCPU, 16),
         VMSTATE_STRUCT_ARRAY(env.itlb, SPARCCPU, 64, 0,
                              vmstate_tlb_entry, SparcTLBEntry),
         VMSTATE_STRUCT_ARRAY(env.dtlb, SPARCCPU, 64, 0,
@@ -168,8 +173,7 @@ const VMStateDescription vmstate_sparc_cpu = {
         VMSTATE_UINT64_ARRAY(env.bgregs, SPARCCPU, 8),
         VMSTATE_UINT64_ARRAY(env.igregs, SPARCCPU, 8),
         VMSTATE_UINT64_ARRAY(env.mgregs, SPARCCPU, 8),
-        VMSTATE_UNUSED(4), /* was unused high half of uint64_t fprs */
-        VMSTATE_UINT32(env.fprs, SPARCCPU),
+        VMSTATE_UINT64(env.fprs, SPARCCPU),
         VMSTATE_UINT64(env.tick_cmpr, SPARCCPU),
         VMSTATE_UINT64(env.stick_cmpr, SPARCCPU),
         VMSTATE_CPU_TIMER(env.tick, SPARCCPU),

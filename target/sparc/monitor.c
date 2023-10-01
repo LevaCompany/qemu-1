@@ -25,34 +25,28 @@
 #include "cpu.h"
 #include "monitor/monitor.h"
 #include "monitor/hmp-target.h"
-#include "monitor/hmp.h"
+#include "hmp.h"
 
 
 void hmp_info_tlb(Monitor *mon, const QDict *qdict)
 {
-    CPUArchState *env1 = mon_get_cpu_env(mon);
+    CPUArchState *env1 = mon_get_cpu_env();
 
-    if (!env1) {
-        monitor_printf(mon, "No CPU available\n");
-        return;
-    }
-    dump_mmu(env1);
+    dump_mmu((FILE*)mon, (fprintf_function)monitor_printf, env1);
 }
 
 #ifndef TARGET_SPARC64
-static target_long monitor_get_psr(Monitor *mon, const struct MonitorDef *md,
-                                   int val)
+static target_long monitor_get_psr (const struct MonitorDef *md, int val)
 {
-    CPUArchState *env = mon_get_cpu_env(mon);
+    CPUArchState *env = mon_get_cpu_env();
 
     return cpu_get_psr(env);
 }
 #endif
 
-static target_long monitor_get_reg(Monitor *mon, const struct MonitorDef *md,
-                                   int val)
+static target_long monitor_get_reg(const struct MonitorDef *md, int val)
 {
-    CPUArchState *env = mon_get_cpu_env(mon);
+    CPUArchState *env = mon_get_cpu_env();
     return env->regwptr[val];
 }
 
@@ -154,7 +148,7 @@ const MonitorDef monitor_defs[] = {
     { "otherwin", offsetof(CPUSPARCState, otherwin) },
     { "wstate", offsetof(CPUSPARCState, wstate) },
     { "cleanwin", offsetof(CPUSPARCState, cleanwin) },
-    { "fprs", offsetof(CPUSPARCState, fprs), NULL, MD_I32 },
+    { "fprs", offsetof(CPUSPARCState, fprs) },
 #endif
     { NULL },
 };

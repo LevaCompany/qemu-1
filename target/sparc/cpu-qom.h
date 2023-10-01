@@ -20,8 +20,7 @@
 #ifndef QEMU_SPARC_CPU_QOM_H
 #define QEMU_SPARC_CPU_QOM_H
 
-#include "hw/core/cpu.h"
-#include "qom/object.h"
+#include "qom/cpu.h"
 
 #ifdef TARGET_SPARC64
 #define TYPE_SPARC_CPU "sparc64-cpu"
@@ -29,25 +28,29 @@
 #define TYPE_SPARC_CPU "sparc-cpu"
 #endif
 
-OBJECT_DECLARE_CPU_TYPE(SPARCCPU, SPARCCPUClass, SPARC_CPU)
+#define SPARC_CPU_CLASS(klass) \
+    OBJECT_CLASS_CHECK(SPARCCPUClass, (klass), TYPE_SPARC_CPU)
+#define SPARC_CPU(obj) \
+    OBJECT_CHECK(SPARCCPU, (obj), TYPE_SPARC_CPU)
+#define SPARC_CPU_GET_CLASS(obj) \
+    OBJECT_GET_CLASS(SPARCCPUClass, (obj), TYPE_SPARC_CPU)
 
-typedef struct sparc_def_t sparc_def_t;
 /**
  * SPARCCPUClass:
  * @parent_realize: The parent class' realize handler.
- * @parent_phases: The parent class' reset phase handlers.
+ * @parent_reset: The parent class' reset handler.
  *
  * A SPARC CPU model.
  */
-struct SPARCCPUClass {
+typedef struct SPARCCPUClass {
     /*< private >*/
     CPUClass parent_class;
     /*< public >*/
 
     DeviceRealize parent_realize;
-    ResettablePhases parent_phases;
-    sparc_def_t *cpu_def;
-};
+    void (*parent_reset)(CPUState *cpu);
+} SPARCCPUClass;
 
+typedef struct SPARCCPU SPARCCPU;
 
 #endif
